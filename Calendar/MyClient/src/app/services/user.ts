@@ -14,7 +14,7 @@ export interface User {
 })
 export class UserService {
   // Check your terminal for the C# port (e.g., 5057 or 5000)
-  private apiUrl = 'https://localhost:7025/api/users'; 
+  private apiUrl = 'http://localhost:5208/api/users'; 
 
   constructor(private http: HttpClient) { }
 

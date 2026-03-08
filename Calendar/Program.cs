@@ -3,7 +3,12 @@ using Calendar.Models;
 using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
-
+builder.Services.AddCors(options => {
+    options.AddPolicy("AllowAngular",
+        policy => policy.WithOrigins("http://localhost:4200")
+                        .AllowAnyMethod()
+                        .AllowAnyHeader());
+});
 builder.Services.AddDbContext<DataContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddCors(options => {
@@ -17,6 +22,10 @@ builder.Services.AddCors(options => {
 builder.Services.AddOpenApi();
 builder.Services.AddControllers();
 var app = builder.Build();
+
+
+
+
 app.UseCors("AllowAngular");
 
 if (app.Environment.IsDevelopment())
