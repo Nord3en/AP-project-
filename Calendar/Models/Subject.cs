@@ -17,7 +17,7 @@ public partial class Subject
 
     public string? GroupNumber { get; set; }
 
-    public virtual ICollection<Task> Tasks { get; set; } = new List<Task>();
+    public virtual ICollection<CalendarTask> CalendarTask { get; set; } = new List<CalendarTask>();
 
     public virtual User User { get; set; } = null!;
 }

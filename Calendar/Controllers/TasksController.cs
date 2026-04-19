@@ -22,14 +22,14 @@ namespace Calendar.Controllers
 
         // GET: api/Tasks
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Task>>> GetTasks()
+        public async Task<ActionResult<IEnumerable<CalendarTask>>> GetTasks()
         {
             return await _context.Tasks.ToListAsync();
         }
 
         // GET: api/Tasks/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Task>> GetTask(int id)
+        public async Task<ActionResult<CalendarTask>> GetTask(int id)
         {
             var task = await _context.Tasks.FindAsync(id);
 
@@ -75,7 +75,7 @@ namespace Calendar.Controllers
         // POST: api/Tasks
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Task>> PostTask(Task task)
+        public async Task<ActionResult<CalendarTask>> PostTask(CalendarTask task)
         {
             _context.Tasks.Add(task);
             await _context.SaveChangesAsync();

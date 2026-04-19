@@ -15,5 +15,5 @@ public partial class User
 
     public virtual ICollection<Subject> Subjects { get; set; } = new List<Subject>();
 
-    public virtual ICollection<Task> Tasks { get; set; } = new List<Task>();
+    public virtual ICollection<CalendarTask> CalendarTask { get; set; } = new List<CalendarTask>();
 }
