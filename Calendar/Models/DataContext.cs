@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
-
+using System.ComponentModel.DataAnnotations.Schema;
 namespace Calendar.Models;
 
 public partial class DataContext : DbContext
@@ -17,7 +17,7 @@ public partial class DataContext : DbContext
 
     public virtual DbSet<Subject> Subjects { get; set; }
 
-    public virtual DbSet<Task> Tasks { get; set; }
+    public virtual DbSet<CalendarTask> Tasks { get; set; }
 
     public virtual DbSet<User> Users { get; set; }
 
@@ -54,7 +54,7 @@ public partial class DataContext : DbContext
                 .HasConstraintName("fk_user_subject");
         });
 
-        modelBuilder.Entity<Task>(entity =>
+        modelBuilder.Entity<CalendarTask>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("tasks_pkey");
 
@@ -78,12 +78,12 @@ public partial class DataContext : DbContext
                 .HasColumnName("title");
             entity.Property(e => e.UserId).HasColumnName("user_id");
 
-            entity.HasOne(d => d.Sub).WithMany(p => p.Tasks)
+            entity.HasOne(d => d.Sub).WithMany(p => p.CalendarTask)
                 .HasForeignKey(d => d.Subid)
                 .OnDelete(DeleteBehavior.SetNull)
                 .HasConstraintName("fk_subject_task");
 
-            entity.HasOne(d => d.User).WithMany(p => p.Tasks)
+            entity.HasOne(d => d.User).WithMany(p => p.CalendarTask)
                 .HasForeignKey(d => d.UserId)
                 .HasConstraintName("fk_user_task");
         });
