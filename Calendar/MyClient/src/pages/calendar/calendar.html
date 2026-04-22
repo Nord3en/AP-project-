@@ -1,0 +1,77 @@
+<div class="main-layout">
+    <header class="top-nav">
+        <div class="nav-left">
+            <button class="nav-dropdown">Monthly ▼</button>
+
+            <div class="filter-wrapper">
+                <button class="nav-dropdown" (click)="toggleFilter()">Filter by subject ▼</button>
+                <div class="filter-dropdown" *ngIf="showFilter">
+                    <p>Filter by subject</p>
+                    <label><input type="checkbox"> Research Methods</label>
+                    <label><input type="checkbox"> Engines of Digital Business</label>
+                    <button class="apply-btn" (click)="toggleFilter()">Apply</button>
+                </div>
+            </div>
+
+            <button class="today-btn">Today</button>
+            <div class="date-stepper">
+                <button>&lt;</button>
+                <span>1 Apr 2026 - 1 May 2026</span>
+                <button>&gt;</button>
+            </div>
+        </div>
+        <button class="create-btn">Create new task or event</button>
+    </header>
+
+    <div class="content-body">
+        <aside class="sidebar">
+            <h1 class="logo">Classroom</h1>
+            <button class="menu-item active" (click)="toggleTaskBar()">Tasks</button>
+
+            <div class="agenda-card">
+                <h3>Agenda</h3>
+                <div class="agenda-section">
+                    <p class="section-title">Due Today</p>
+                    <p><span class="dot red"></span> AI & ML</p>
+                    <p><span class="dot yellow"></span> Research Methods</p>
+                </div>
+            </div>
+            <button class="logout-btn">Logout</button>
+        </aside>
+
+        <main class="calendar-main">
+            <div class="days-header">
+                <span *ngFor="let day of days">{{day}}</span>
+            </div>
+            <div class="calendar-grid">
+                <div *ngFor="let cell of [].constructor(35); let i = index" class="calendar-cell">
+                    <div *ngIf="i === 1" class="event yellow-event">
+                        <strong>Applied Programming</strong><br>DH.Ø.1.23.
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <footer class="task-bar" [class.open]="isTaskBarOpen">
+        <div class="task-table-header">
+            <span>Task</span>
+            <span>Status</span>
+            <span>Description</span>
+            <span>Start</span>
+            <span>End</span>
+            <span>Action</span>
+        </div>
+        <div class="task-row">
+            <div class="task-check">
+                <input type="checkbox" (change)="markDone($event)">
+                <span class="tag-ai">AI and ML</span>
+            </div>
+            <span class="status-pill">In progress</span>
+            <span class="text-truncate">Define dataset</span>
+            <span>3-3-2026</span>
+            <span>5-3-2026</span>
+            <button class="delete-btn">🗑️</button>
+        </div>
+    </footer>
+</div>

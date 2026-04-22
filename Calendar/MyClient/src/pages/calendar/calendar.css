@@ -1,0 +1,74 @@
+/* Filter Popover */
+.filter-wrapper {
+    position: relative;
+}
+
+.filter-dropdown {
+    position: absolute;
+    top: 45px;
+    left: 0;
+    background: white;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 200px;
+    color: black;
+}
+
+.apply-btn {
+    background: #ccc;
+    border-radius: 20px;
+    padding: 5px;
+    border: none;
+    cursor: pointer;
+}
+
+/* Task Bar Animation */
+.task-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #9B6B6B;
+    /* Brown from your drawing */
+    height: 0;
+    transition: height 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    overflow-y: auto;
+    color: white;
+    padding: 0 40px;
+}
+
+.task-bar.open {
+    height: 300px;
+    /* Adjust based on how many tasks you show */
+    padding-top: 20px;
+}
+
+/* Agenda Styles */
+.agenda-card {
+    background: #D1D1D1;
+    border-radius: 0 10px 10px 0;
+    padding: 15px;
+    margin-top: 20px;
+    color: black;
+}
+
+.dot {
+    height: 10px;
+    width: 10px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 5px;
+}
+
+.red {
+    background: red;
+}
+
+.yellow {
+    background: yellow;
+}
