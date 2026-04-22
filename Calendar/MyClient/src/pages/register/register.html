@@ -4,20 +4,20 @@
 
         <div class="input-section">
             <div class="label-box">Name</div>
-            <input type="text" class="custom-input">
+            <input type="text" class="custom-input" [(ngModel)]="name">
         </div>
 
         <div class="input-section">
             <div class="label-box">Email</div>
-            <input type="email" class="custom-input">
+            <<input type="email" class="custom-input" [(ngModel)]="email">
         </div>
 
         <div class="input-section">
             <div class="label-box">Password</div>
-            <input type="password" class="custom-input">
+            <<input type="password" class="custom-input" [(ngModel)]="password">
         </div>
 
-        <button class="signup-btn" routerLink="/calendar">Sign up</button>
+        <button class="signup-btn" (click)="onRegister()">Sign up</button>
 
         <p class="footer-text">Already have an account?</p>
         <button class="login-btn" routerLink="/login">Back to Sign In</button>
