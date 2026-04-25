@@ -1,95 +1,157 @@
 .calendar-page {
-    display: flex;
-    min-height: 100vh;
-    font-family: Arial, sans-serif;
-    background-color: #f5f5f5;
+  display: flex;
+  min-height: 100vh;
+  font-family: Arial, sans-serif;
+  background-color: #f5f5f5;
 }
 
 .sidebar {
-    width: 260px;
-    background-color: #d9d9d9;
-    padding: 20px;
-    box-sizing: border-box;
-    border-right: 1px solid #bbb;
-}
-
-.sidebar h2 {
-    margin-top: 0;
+  width: 260px;
+  background-color: #d9d9d9;
+  padding: 20px;
+  box-sizing: border-box;
+  border-right: 1px solid #bbb;
 }
 
 .menu-btn,
 .logout-btn {
-    width: 100%;
-    padding: 12px;
-    margin-bottom: 12px;
-    border: none;
-    background-color: white;
-    cursor: pointer;
-    border-radius: 6px;
-    font-size: 14px;
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 12px;
+  border: none;
+  background-color: white;
+  cursor: pointer;
+  border-radius: 6px;
 }
 
 .agenda-box {
-    background-color: white;
-    padding: 15px;
-    border-radius: 8px;
-    margin-top: 20px;
-    margin-bottom: 20px;
+  background-color: white;
+  padding: 15px;
+  border-radius: 8px;
+  margin-top: 20px;
+  margin-bottom: 20px;
 }
 
 .calendar-main {
-    flex: 1;
-    padding: 24px;
-    box-sizing: border-box;
+  flex: 1;
+  padding: 24px;
 }
 
 .calendar-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .calendar-header button {
-    padding: 8px 14px;
-    font-size: 18px;
-    cursor: pointer;
+  padding: 8px 14px;
+  font-size: 18px;
+  cursor: pointer;
 }
 
 .weekdays {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    margin-bottom: 10px;
-    gap: 8px;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+  margin-bottom: 10px;
 }
 
 .weekday {
-    text-align: center;
-    font-weight: bold;
-    padding: 10px 0;
-    background-color: #ececec;
-    border-radius: 6px;
+  text-align: center;
+  font-weight: bold;
+  padding: 10px;
+  background-color: #ececec;
+  border-radius: 6px;
 }
 
 .calendar-grid {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 8px;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
 }
 
 .calendar-cell {
-    background-color: white;
-    min-height: 110px;
-    border-radius: 8px;
-    padding: 10px;
-    box-sizing: border-box;
-    border: 1px solid #ddd;
+  background-color: white;
+  min-height: 120px;
+  border-radius: 8px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  cursor: pointer;
 }
 
 .calendar-cell.empty {
-    background-color: #f0f0f0;
+  background-color: #f0f0f0;
+  cursor: default;
 }
 
 .calendar-cell.today {
-    border: 2px solid #4f46e5;
+  border: 2px solid #4f46e5;
+}
+
+.calendar-cell.selected {
+  outline: 3px solid #999;
+}
+
+.add-task-btn {
+  display: block;
+  margin-top: 10px;
+  padding: 5px 8px;
+  border: none;
+  border-radius: 5px;
+  background-color: #4f46e5;
+  color: white;
+  cursor: pointer;
+}
+
+.task-box {
+  margin-top: 20px;
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+.task-box textarea {
+  width: 100%;
+  height: 100px;
+  margin-bottom: 12px;
+}
+
+.task-box select {
+  display: block;
+  margin-bottom: 12px;
+  padding: 6px;
+}
+
+.task-preview {
+  margin-top: 8px;
+  font-size: 13px;
+  font-weight: bold;
+  cursor: pointer;
+
+}
+
+.more-tasks-btn {
+  margin-top: 6px;
+  border: none;
+  background: transparent;
+  color: #4f46e5;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: bold;
+}
+
+.calendar-cell {
+  overflow: hidden;
+}
+
+.calendar-cell.selected {
+  overflow: visible;
+}
+
+.agenda-task {
+  margin-bottom: 6px;
+  font-size: 13px;
+  font-weight: bold;
+  cursor: pointer;
 }

@@ -1,38 +1,148 @@
 <div class="calendar-page">
-    <aside class="sidebar">
-        <h2>Classroom</h2>
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <h2>Classroom</h2>
 
-        <button class="menu-btn">Calendar</button>
-        <button class="menu-btn">Subjects</button>
-        <button class="menu-btn">Tasks</button>
+    <button class="menu-btn">Calendar</button>
+    <button class="menu-btn">Subjects</button>
+    <button class="menu-btn">Tasks</button>
 
-        <div class="agenda-box">
-            <h3>Agenda</h3>
-            <p><strong>Today:</strong> No tasks yet</p>
-            <p><strong>Tomorrow:</strong> No tasks yet</p>
+    <div class="agenda-box">
+  <h3>Agenda</h3>
+
+  <h4>Today</h4>
+  <p *ngIf="getTodayTasks().length === 0">No tasks yet</p>
+
+  <div
+    class="agenda-task"
+    *ngFor="let task of getTodayTasks()"
+    [style.color]="task.color"
+    (click)="openTaskEditor(task)"
+  >
+    {{ getFirstFiveWords(task.text) }}
+  </div>
+
+  <h4>Tomorrow</h4>
+  <p *ngIf="getTomorrowTasks().length === 0">No tasks yet</p>
+
+  <div
+    class="agenda-task"
+    *ngFor="let task of getTomorrowTasks()"
+    [style.color]="task.color"
+    (click)="openTaskEditor(task)"
+  >
+    {{ getFirstFiveWords(task.text) }}
+  </div>
+</div>
+
+    <button class="logout-btn">Logout</button>
+  </aside>
+
+  <!-- MAIN CALENDAR -->
+  <main class="calendar-main">
+    <!-- HEADER -->
+    <div class="calendar-header">
+      <button (click)="previousMonth()">&lt;</button>
+      <h1>{{ monthName }} {{ year }}</h1>
+      <button (click)="nextMonth()">&gt;</button>
+    </div>
+
+    <!-- WEEKDAYS -->
+    <div class="weekdays">
+      <div class="weekday" *ngFor="let d of weekDays">
+        {{ d }}
+      </div>
+    </div>
+
+    <!-- CALENDAR GRID -->
+    <div class="calendar-grid">
+      <div
+        class="calendar-cell"
+        *ngFor="let day of calendarDays"
+        [class.empty]="!day.isCurrentMonth"
+        [class.today]="day.isToday"
+        [class.selected]="selectedDay === day.dayNumber"
+        (click)="selectDate(day)"
+      >
+        <strong>{{ day.dayNumber }}</strong>
+
+        <!-- ADD TASK BUTTON -->
+        <button
+          *ngIf="selectedDay === day.dayNumber && day.dayNumber !== null"
+          class="add-task-btn"
+          (click)="openAddTaskBox(); $event.stopPropagation()"
+        >
+          Add Task
+        </button>
+
+        <!-- TASK LIST -->
+        <!-- TASK LIST -->
+<div
+  class="task-preview"
+  *ngFor="
+    let task of isDayExpanded(day.dayNumber)
+      ? getTasksForDay(day.dayNumber)
+      : getTasksForDay(day.dayNumber).slice(0, 3)
+  "
+  [style.color]="task.color"
+  (click)="openTaskEditor(task); $event.stopPropagation()"
+>
+  {{ getFirstFiveWords(task.text) }}
+</div>
+
+<button
+  class="more-tasks-btn"
+  *ngIf="getTasksForDay(day.dayNumber).length > 3"
+  (click)="toggleMoreTasks(day.dayNumber); $event.stopPropagation()"
+>
+  {{ isDayExpanded(day.dayNumber) ? 'Show Less' : 'More Tasks...' }}
+</button>
+
+        <!-- ADD TASK BOX -->
+        <div
+          class="task-box"
+          *ngIf="showTaskBox && selectedDay === day.dayNumber"
+          (click)="$event.stopPropagation()"
+        >
+          <h4>Add Task</h4>
+
+          <textarea
+            [(ngModel)]="newTaskText"
+            placeholder="Type your task..."
+          ></textarea>
+
+          <label>Color:</label>
+          <select [(ngModel)]="selectedColor">
+            <option *ngFor="let color of colorOptions" [value]="color">
+              {{ color }}
+            </option>
+          </select>
+
+          <button (click)="addTask()">Save</button>
         </div>
 
-        <button class="logout-btn">Logout</button>
-    </aside>
+        <!-- EDIT TASK BOX -->
+        <div
+          class="task-box"
+          *ngIf="showEditBox && selectedTask?.day === day.dayNumber"
+          (click)="$event.stopPropagation()"
+        >
+          <h4>Edit Task</h4>
 
-    <main class="calendar-main">
-        <div class="calendar-header">
-            <button (click)="previousMonth()">&#60;</button>
-            <h1>{{ monthName }} {{ year }}</h1>
-            <button (click)="nextMonth()">&#62;</button>
-        </div>
+          <textarea [(ngModel)]="editedTaskText"></textarea>
 
-        <div class="weekdays">
-            <div class="weekday" *ngFor="let day of weekDays">
-                {{ day }}
-            </div>
-        </div>
+          <label>Color:</label>
+          <select [(ngModel)]="editedTaskColor">
+            <option *ngFor="let color of colorOptions" [value]="color">
+              {{ color }}
+            </option>
+          </select>
 
-        <div class="calendar-grid">
-            <div class="calendar-cell" *ngFor="let day of calendarDays" [class.empty]="!day.isCurrentMonth"
-                [class.today]="day.isToday">
-                <span *ngIf="day.dayNumber">{{ day.dayNumber }}</span>
-            </div>
+          <button (click)="saveEditedTask()">Save Changes</button>
+          <button (click)="deleteTask()">Delete</button>
+          <button (click)="cancelEdit()">Cancel</button>
         </div>
-    </main>
+      </div>
+    </div>
+  </main>
 </div>
