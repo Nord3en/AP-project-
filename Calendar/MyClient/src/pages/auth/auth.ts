@@ -166,13 +166,12 @@ export class AuthComponent {
     this.authService.login(this.email,this.password).subscribe({
         next: (response) => {
         console.log('successful login', response);
-        alert('successful login');
         this.router.navigate(['/calendar']); // Take them to the login page
       },
       error: (err) => {
         console.error('Oops!', err);
-        alert('unsuccessful login');
-        this.errorMessage = 'login failed. That email or the password is wrong';
+        
+        this.errorMessage = 'Login failed. Tha email or the password is wrong';
       }
     })
 

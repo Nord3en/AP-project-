@@ -44,14 +44,14 @@ namespace Calendar.Controllers
         // PUT: api/Tasks/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutTask(int id, Task task)
+        public async Task<IActionResult> PutTask(int id, CalendarTask CalendarTask)
         {
-            if (id != task.Id)
+            if (id != CalendarTask.Id)
             {
                 return BadRequest();
             }
 
-            _context.Entry(task).State = EntityState.Modified;
+            _context.Entry(CalendarTask).State = EntityState.Modified;
 
             try
             {
