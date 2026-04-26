@@ -1,6 +1,8 @@
-import { Component } from '@angular/core';
+import { Component,inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterLink,Router } from '@angular/router';
+import { AuthService } from '../../app/services/auth.service'; //
 
 interface CalendarTask {
   text: string;
@@ -24,6 +26,12 @@ interface CalendarDay {
   styleUrls: ['./calendar.css']
 })
 export class CalendarComponent {
+
+
+  
+   private authService = inject(AuthService);
+  private router = inject(Router);
+
   weekDays: string[] = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
   currentDate: Date = new Date(2026, 3, 1);
@@ -42,6 +50,17 @@ export class CalendarComponent {
 
   tasks: CalendarTask[] = [];
 
+  logout(): void {
+    this.authService.logout().subscribe({
+      next: () => {
+        console.log('Logged out successfully');
+        this.router.navigate(['/auth']); 
+      },
+      error: (err) => {
+        console.error('Logout failed', err);
+      }
+    });
+  }
  ngOnInit(): void {
   this.loadTasks();
   this.buildCalendar();

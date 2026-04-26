@@ -46,6 +46,7 @@ export class Register {
       },
       error: (err) => {
         console.error('Oops!', err);
+        alert('Registration failed. That email might already be taken.');
         this.errorMessage = 'Registration failed. That email might already be taken.';
       }
     });

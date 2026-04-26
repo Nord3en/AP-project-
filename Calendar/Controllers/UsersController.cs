@@ -6,6 +6,11 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Calendar.Models;
+using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization; // Added this so you can use [Authorize]!
 
 namespace Calendar.Controllers
 {
@@ -83,61 +88,84 @@ namespace Calendar.Controllers
             return CreatedAtAction("GetUser", new { id = user.Uid }, user);
         }
 
-// POST: api/Users/register
-[HttpPost("register")]
-public async Task<ActionResult<User>> Register(AuthRequest request)
-{
-    // 1. Check if a user with this email already exists
-    if (await _context.Users.AnyAsync(u => u.Email == request.Email))
-    {
-        return BadRequest("A user with this email already exists.");
-    }
+        // POST: api/Users/register
+        [HttpPost("register")]
+        public async Task<ActionResult<User>> Register(RegisterRequest request)
+        {
+            // 1. Check if a user with this email already exists
+            if (await _context.Users.AnyAsync(u => u.Email == request.Email))
+            {
+                return BadRequest("A user with this email already exists.");
+            }
 
-    // 2. Hash the password using BCrypt
-    string hashedPassword = BCrypt.Net.BCrypt.HashPassword(request.Passhash);
+            // 2. Hash the password using BCrypt
+            string hashedPassword = BCrypt.Net.BCrypt.HashPassword(request.Passhash);
 
-    // 3. Create the new User object to save in the database
-    var newUser = new User
-    {
-        Email = request.Email,
-        Name = request.Name,
-        // Save the HASHED password to your database, not the plain text one!
-        // (Assuming your database model uses the property name 'Passhash')
-        Passhash = hashedPassword 
-    };
+            // 3. Create the new User object to save in the database
+            var newUser = new User
+            {
+                Email = request.Email,
+                Name = request.Name,
+                // Save the HASHED password to your database, not the plain text one!
+                // (Assuming your database model uses the property name 'Passhash')
+                Passhash = hashedPassword 
+            };
 
-    // 4. Save to database
-    _context.Users.Add(newUser);
-    await _context.SaveChangesAsync();
+            // 4. Save to database
+            _context.Users.Add(newUser);
+            await _context.SaveChangesAsync();
 
-    return Ok(newUser);
-}
+            return Ok(newUser);
+        }
 
-// POST: api/Users/login
-[HttpPost("login")]
-public async Task<ActionResult<User>> Login(AuthRequest request)
-{
-    // 1. Look for the user by their email
-    var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
-    
-    // If the user isn't found in the database
-    if (user == null)
-    {
-        return BadRequest("User not found.");
-    }
+        // POST: api/Users/login
+        [HttpPost("login")]
+        public async Task<IActionResult> Login(LoginRequest request) // <-- Fixed return type here!
+        {
+            // 1. Look for the user by their email
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
+            
+            // If the user isn't found in the database
+            if (user == null)
+            {
+                return BadRequest("User not found.");
+            }
 
-    // 2. Compare the typed password with the hashed password in the database
-    bool isPasswordValid = BCrypt.Net.BCrypt.Verify(request.Passhash, user.Passhash);
-    
-    // If they don't match
-    if (!isPasswordValid)
-    {
-        return BadRequest("Wrong password.");
-    }
+            // 2. Compare the typed password with the hashed password in the database
+            bool isPasswordValid = BCrypt.Net.BCrypt.Verify(request.Passhash, user.Passhash);
+            
+            // If they don't match
+            if (!isPasswordValid)
+            {
+                return BadRequest("Wrong password.");
+            }
 
-    // 3. If everything is correct, log them in!
-    return Ok(user);
-}
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.NameIdentifier, user.Uid.ToString()),
+                new Claim(ClaimTypes.Name, user.Name), // Assuming your User model has a Name property
+                new Claim(ClaimTypes.Email, user.Email)
+            };
+
+            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);    
+
+            await HttpContext.SignInAsync(
+                CookieAuthenticationDefaults.AuthenticationScheme, 
+                new ClaimsPrincipal(claimsIdentity)
+            );
+
+            // 3. If everything is correct, log them in!
+           return Ok(new { message = "Logged in successfully", user = new { user.Uid, user.Name, user.Email } });
+        }
+
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout()
+        {
+            // This destroys the cookie in the user's browser
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            return Ok(new { message = "Logged out successfully" });
+        }
+
         // DELETE: api/Users/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(int id)
@@ -160,10 +188,16 @@ public async Task<ActionResult<User>> Login(AuthRequest request)
         }
     }
 
-    public class AuthRequest
-  {
-    public string Email { get; set; }
-    public string Passhash { get; set; } // This is the plain password from Angular
-    public string Name { get; set; }
-  }
+    public class RegisterRequest
+    {
+        public string Email { get; set; }
+        public string Passhash { get; set; } // This is the plain password from Angular
+        public string Name { get; set; }
+    }
+
+    public class LoginRequest
+    {
+        public string Email { get; set; }
+        public string Passhash { get; set; } // This is the plain password from Angular
+    }
 }

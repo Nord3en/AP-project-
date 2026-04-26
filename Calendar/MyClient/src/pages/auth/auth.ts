@@ -1,12 +1,12 @@
-import { Component } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Component,inject } from '@angular/core';
+import { RouterLink,Router } from '@angular/router';
 import { FormsModule } from '@angular/forms'; 
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../app/services/auth.service'; //
 @Component({
   selector: 'app-auth',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, FormsModule, CommonModule],
   template: `
     <div class="auth-screen">
       <h1 class="welcome-title">Student Organization Calendar</h1>
@@ -16,15 +16,17 @@ import { AuthService } from '../../app/services/auth.service'; //
         
         <div class="input-section">
           <div class="label-box">Enter your school email address</div>
-          <input type="email" class="custom-input" placeholder="name@school.edu">
+          <input type="email" class="custom-input" [(ngModel)]="email" placeholder="name@school.edu" >
         </div>
 
         <div class="input-section">
           <div class="label-box">Enter password</div>
-          <input type="password" class="custom-input" placeholder="••••••••">
+          <input type="password" class="custom-input" [(ngModel)]="password" placeholder="••••••••">
         </div>
-
-        <button class="continue-btn" routerLink="/calendar">Continue</button>
+      <div *ngIf="errorMessage" style="color: red; font-size: 13px; margin-bottom: 10px;">
+            {{ errorMessage }}
+      </div>
+        <button class="continue-btn" (click)="onAuth()">Continue</button>
 
         <p class="signup-text">Don't have an account yet?</p>
         <button class="create-btn" routerLink="/register">Create it here</button>      </div>
@@ -143,4 +145,40 @@ import { AuthService } from '../../app/services/auth.service'; //
     }
   `]
 })
-export class AuthComponent { }
+export class AuthComponent {
+
+  private authService = inject(AuthService);
+  private router = inject(Router);
+  email = '';
+  password = '';
+  errorMessage='';
+
+  onAuth(){
+    
+    if(!this.email || !this.password){
+      this.errorMessage="All field are required"
+        alert('All field are required');
+      console.log("All field are required")
+      return;
+    }
+
+
+    this.authService.login(this.email,this.password).subscribe({
+        next: (response) => {
+        console.log('successful login', response);
+        alert('successful login');
+        this.router.navigate(['/calendar']); // Take them to the login page
+      },
+      error: (err) => {
+        console.error('Oops!', err);
+        alert('unsuccessful login');
+        this.errorMessage = 'login failed. That email or the password is wrong';
+      }
+    })
+
+  }
+
+   
+  
+
+}

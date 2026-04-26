@@ -1,7 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
-
 export interface User {
   uid?: number; // The '?' means it's optional, because a brand new user doesn't have an ID yet!
   email: string;
@@ -15,7 +14,7 @@ export interface User {
 export class AuthService {
   private http = inject(HttpClient);
   
-  // REMEMBER: Change 7123 to your actual C# port!
+  // REMEMBER: Change 5208 to your actual C# port if it ever changes!
   private backendUrl = 'http://localhost:5208/api/Users'; 
 
   // 📝 1. The Registration Method
@@ -26,8 +25,19 @@ export class AuthService {
 
   // 🔐 2. The Login Method
   login(email: string, passhash: string) {
-    // We bundle the email and password together and send it to the login window
     const loginData = { email: email, passhash: passhash };
-    return this.http.post(`${this.backendUrl}/login`, loginData);
+    
+    // Notice the third parameter here! We are telling Angular to accept the cookie.
+    return this.http.post(`${this.backendUrl}/login`, loginData, { 
+      withCredentials: true 
+    });
+  }
+
+  // 🚪 3. The Logout Method (NEW!)
+  logout() {
+    // We send an empty object {} because the backend just needs to know to destroy the cookie
+    return this.http.post(`${this.backendUrl}/logout`, {}, { 
+      withCredentials: true 
+    });
   }
 }

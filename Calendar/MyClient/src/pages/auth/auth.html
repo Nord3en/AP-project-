@@ -1,1 +1,26 @@
-<p>auth works!</p>
+
+  selector: 'app-auth',
+  standalone: true,
+  imports: [RouterLink],
+  template: `
+    <div class="auth-screen">
+      <h1 class="welcome-title">Student Organization Calendar</h1>
+      
+      <div class="login-card">
+        <h2 class="card-header">Welcome</h2>
+        
+        <div class="input-section">
+          <div class="label-box">Enter your school email address</div>
+          <input type="email" class="custom-input" placeholder="name@school.edu" >
+        </div>
+
+        <div class="input-section">
+          <div class="label-box">Enter password</div>
+          <input type="password" class="custom-input" placeholder="••••••••">
+        </div>
+
+        <button class="continue-btn" routerLink="/calendar">Continue</button>
+
+        <p class="signup-text">Don't have an account yet?</p>
+        <button class="create-btn" routerLink="/register">Create it here</button>      </div>
+    </div>
