@@ -154,8 +154,9 @@ export class AuthComponent {
   errorMessage='';
 
   onAuth(){
-    
+    console.error('inside onauth function');
     if(!this.email || !this.password){
+      console.error('error');
       this.errorMessage="All field are required"
         alert('All field are required');
       console.log("All field are required")
@@ -171,7 +172,7 @@ export class AuthComponent {
       error: (err) => {
         console.error('Oops!', err);
         
-        this.errorMessage = 'Login failed. Tha email or the password is wrong';
+        this.errorMessage = 'Login failed. The email or the password is wrong';
       }
     })
 

@@ -26,9 +26,9 @@ export class AuthService {
   // 🔐 2. The Login Method
   login(email: string, passhash: string) {
     const loginData = { email: email, passhash: passhash };
-    
+  
     // Notice the third parameter here! We are telling Angular to accept the cookie.
-    return this.http.post(`${this.backendUrl}/login`, loginData, { 
+    return this.http.post(`http://localhost:5208/api/Users/login`, loginData, { 
       withCredentials: true 
     });
   }
