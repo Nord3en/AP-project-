@@ -1,8 +1,6 @@
 import { Routes } from '@angular/router';
 import { AuthComponent } from '../pages/auth/auth';
 import { CalendarComponent } from '../pages/calendar/calendar';
-import { Subjects } from '../pages/subjects/subjects';
-import { Tasks } from '../pages/tasks/tasks';
 import { Register } from '../pages/register/register';
 
 export const routes: Routes = [
@@ -13,8 +11,6 @@ export const routes: Routes = [
 
     // App pages
     { path: 'calendar', component: CalendarComponent },
-    { path: 'subjects', component: Subjects },
-    { path: 'tasks', component: Tasks },
 
     // Wildcard route (redirects any typed-in typos to login)
     { path: '**', redirectTo: 'login' }
