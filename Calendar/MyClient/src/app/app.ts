@@ -16,13 +16,5 @@ export class AppComponent implements OnInit {
   constructor(private userService: UserService) {}
 
   ngOnInit(): void {
-    this.userService.getUsers().subscribe({
-      next: (data: User[]) => { // Added : User[]
-        this.users = data;
-      },
-      error: (err: any) => {    // Added : any
-        console.error('API Error:', err);
-      }
-    });
   }
 }
