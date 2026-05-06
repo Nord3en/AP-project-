@@ -24,10 +24,24 @@ namespace Calendar.Controllers
         }
 
         // GET: api/Tasks
-        [HttpGet]
+        [HttpGet]// GET: api/Tasks
+        [Authorize]
         public async Task<ActionResult<IEnumerable<CalendarTask>>> GetTasks()
         {
-            return await _context.Tasks.ToListAsync();
+
+            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrEmpty(userIdString))
+            {
+                return Unauthorized();
+            }
+
+            int currentUserId = int.Parse(userIdString);
+
+
+            return await _context.Tasks
+                .Where(t => t.UserId == currentUserId)
+                .ToListAsync();
         }
 
         // GET: api/Tasks/5
