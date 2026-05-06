@@ -6,6 +6,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Calendar.Models;
+using Microsoft.AspNetCore.Authorization; 
+using System.Security.Claims;      
+
 
 namespace Calendar.Controllers
 {
@@ -44,13 +47,20 @@ namespace Calendar.Controllers
         // PUT: api/Tasks/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
+        [Authorize]
         public async Task<IActionResult> PutTask(int id, CalendarTask CalendarTask)
         {
             if (id != CalendarTask.Id)
             {
                 return BadRequest();
             }
-
+                var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdString))
+            {
+                return Unauthorized("You must be logged in to edit a task.");
+            }
+            CalendarTask.UserId=Convert.ToInt32(userIdString);
+            CalendarTask.Subid=1 ;// it is set to the uncategorized subject id for now 
             _context.Entry(CalendarTask).State = EntityState.Modified;
 
             try
@@ -75,8 +85,16 @@ namespace Calendar.Controllers
         // POST: api/Tasks
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        [Authorize]
         public async Task<ActionResult<CalendarTask>> PostTask(CalendarTask task)
         {
+            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdString))
+            {
+                 return Unauthorized("You must be logged in to create a task.");
+            }
+            task.UserId = int.Parse(userIdString);
+            task.Subid = 1;
             _context.Tasks.Add(task);
             await _context.SaveChangesAsync();
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace Calendar.Models;
 [Table("Task")]
@@ -26,5 +27,6 @@ public partial class CalendarTask
 
     public virtual Subject? Sub { get; set; }
 
-    public virtual User User { get; set; } = null!;
+[JsonIgnore] 
+public virtual User? User { get; set; }
 }
