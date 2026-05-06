@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
-// Check this path carefully!
 import { UserService, User } from './services/user'; 
 
 @Component({
