@@ -57,7 +57,7 @@
 
 <div class="task-modal" *ngIf="showTaskBox">
   <div class="task-box">
-    <h2>{{ selectedTask ? 'Edit Task' : 'Add Task' }}</h2>
+    <h2>Add Task</h2>
 
     <label>Category</label>
     <input type="text" [(ngModel)]="newTaskCategory" placeholder="Example: Work" />
@@ -79,17 +79,64 @@
     </select>
 
     <div class="task-buttons">
-      <button *ngIf="!selectedTask" (click)="addTask()">Save Task</button>
-
-      <button *ngIf="selectedTask" (click)="saveEditedTask()">
-        Save Changes
-      </button>
-
-      <button *ngIf="selectedTask" class="delete-btn" (click)="deleteTask()">
-        Delete Task
-      </button>
-
+      <button (click)="addTask()">Save Task</button>
       <button (click)="closeTaskBox()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div class="task-modal" *ngIf="selectedTask">
+  <div class="task-box" *ngIf="!isEditingTask">
+    <h2>Task Details</h2>
+
+    <p><strong>Category:</strong> {{ selectedTask.category || 'None' }}</p>
+
+    <p>
+      <strong>Time:</strong>
+      {{ getTaskTimeDisplay(selectedTask) || 'No time added' }}
+    </p>
+
+    <p><strong>Task:</strong></p>
+    <p>{{ selectedTask.text }}</p>
+
+    <p>
+      <strong>Color:</strong>
+      <span class="color-preview" [style.background-color]="selectedTask.color"></span>
+      {{ selectedTask.color }}
+    </p>
+
+    <div class="task-buttons">
+      <button (click)="startEditingTask()">Edit</button>
+      <button class="delete-btn" (click)="deleteTask()">Delete</button>
+      <button (click)="closeTaskDetails()">Close</button>
+    </div>
+  </div>
+
+  <div class="task-box" *ngIf="isEditingTask">
+    <h2>Edit Task</h2>
+
+    <label>Category</label>
+    <input type="text" [(ngModel)]="editTaskCategory" placeholder="Example: Work" />
+
+    <label>Start Time</label>
+    <input type="time" [(ngModel)]="editTaskStartTime" />
+
+    <label>End Time</label>
+    <input type="time" [(ngModel)]="editTaskEndTime" />
+
+    <label>Task</label>
+    <textarea [(ngModel)]="editTaskText" placeholder="Write your task here"></textarea>
+
+    <label>Color</label>
+    <select [(ngModel)]="editTaskColor">
+      <option *ngFor="let color of colorOptions" [value]="color">
+        {{ color }}
+      </option>
+    </select>
+
+    <div class="task-buttons">
+      <button (click)="saveEditedTask()">Save Changes</button>
+      <button (click)="cancelEditingTask()">Cancel</button>
     </div>
   </div>
 </div>

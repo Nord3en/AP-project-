@@ -37,13 +37,13 @@ export class CalendarComponent {
   tasks: CalendarTask[] = [];
 
   selectedDay: number | null = null;
-  showTaskBox = false;
+  showTaskBox: boolean = false;
 
-  newTaskCategory = '';
-  newTaskText = '';
-  newTaskColor = 'black';
-  newTaskStartTime = '';
-  newTaskEndTime = '';
+  newTaskCategory: string = '';
+  newTaskText: string = '';
+  newTaskColor: string = 'black';
+  newTaskStartTime: string = '';
+  newTaskEndTime: string = '';
 
   colorOptions: string[] = [
     'black',
@@ -57,13 +57,13 @@ export class CalendarComponent {
   ];
 
   selectedTask: CalendarTask | null = null;
-  isEditingTask = false;
+  isEditingTask: boolean = false;
 
-  editTaskCategory = '';
-  editTaskText = '';
-  editTaskColor = 'black';
-  editTaskStartTime = '';
-  editTaskEndTime = '';
+  editTaskCategory: string = '';
+  editTaskText: string = '';
+  editTaskColor: string = 'black';
+  editTaskStartTime: string = '';
+  editTaskEndTime: string = '';
 
   ngOnInit(): void {
     this.loadTasks();
@@ -97,13 +97,15 @@ export class CalendarComponent {
     }
 
     for (let day = 1; day <= daysInMonth; day++) {
+      const isToday =
+        day === today.getDate() &&
+        month === today.getMonth() &&
+        year === today.getFullYear();
+
       this.calendarDays.push({
         dayNumber: day,
         isCurrentMonth: true,
-        isToday:
-          day === today.getDate() &&
-          month === today.getMonth() &&
-          year === today.getFullYear()
+        isToday: isToday
       });
     }
 
@@ -124,6 +126,7 @@ export class CalendarComponent {
     );
 
     this.closeTaskBox();
+    this.closeTaskDetails();
     this.buildCalendar();
   }
 
@@ -146,7 +149,6 @@ export class CalendarComponent {
 
     this.selectedDay = day;
     this.showTaskBox = true;
-
     this.newTaskCategory = '';
     this.newTaskText = '';
     this.newTaskColor = 'black';
@@ -157,7 +159,6 @@ export class CalendarComponent {
   closeTaskBox(): void {
     this.showTaskBox = false;
     this.selectedDay = null;
-
     this.newTaskCategory = '';
     this.newTaskText = '';
     this.newTaskColor = 'black';
@@ -230,44 +231,53 @@ export class CalendarComponent {
 
     return '';
   }
+
   openTaskDetails(task: CalendarTask): void {
     this.selectedTask = task;
-    this.showTaskBox = true;
-
-    this.newTaskCategory = task.category;
-    this.newTaskText = task.text;
-    this.newTaskColor = task.color;
-    this.newTaskStartTime = task.startTime;
-    this.newTaskEndTime = task.endTime;
+    this.isEditingTask = false;
   }
 
-  closeTaskBox(): void {
-    this.showTaskBox = false;
-    this.selectedDay = null;
+  closeTaskDetails(): void {
     this.selectedTask = null;
-
-    this.newTaskCategory = '';
-    this.newTaskText = '';
-    this.newTaskColor = 'black';
-    this.newTaskStartTime = '';
-    this.newTaskEndTime = '';
+    this.isEditingTask = false;
+    this.editTaskCategory = '';
+    this.editTaskText = '';
+    this.editTaskColor = 'black';
+    this.editTaskStartTime = '';
+    this.editTaskEndTime = '';
   }
 
-  saveEditedTask(): void {
-    if (!this.selectedTask || this.newTaskText.trim() === '') {
+  startEditingTask(): void {
+    if (!this.selectedTask) {
       return;
     }
 
-    this.selectedTask.category = this.newTaskCategory.trim();
-    this.selectedTask.text = this.newTaskText.trim();
-    this.selectedTask.color = this.newTaskColor;
-    this.selectedTask.startTime = this.newTaskStartTime;
-    this.selectedTask.endTime = this.newTaskEndTime;
-
-    this.saveTasks();
-    this.closeTaskBox();
+    this.isEditingTask = true;
+    this.editTaskCategory = this.selectedTask.category;
+    this.editTaskText = this.selectedTask.text;
+    this.editTaskColor = this.selectedTask.color;
+    this.editTaskStartTime = this.selectedTask.startTime;
+    this.editTaskEndTime = this.selectedTask.endTime;
   }
 
+  saveEditedTask(): void {
+    if (!this.selectedTask || this.editTaskText.trim() === '') {
+      return;
+    }
+
+    this.selectedTask.category = this.editTaskCategory.trim();
+    this.selectedTask.text = this.editTaskText.trim();
+    this.selectedTask.color = this.editTaskColor;
+    this.selectedTask.startTime = this.editTaskStartTime;
+    this.selectedTask.endTime = this.editTaskEndTime;
+
+    this.saveTasks();
+    this.isEditingTask = false;
+  }
+
+  cancelEditingTask(): void {
+    this.isEditingTask = false;
+  }
 
   deleteTask(): void {
     if (!this.selectedTask) {
