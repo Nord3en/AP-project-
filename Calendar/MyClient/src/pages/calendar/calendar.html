@@ -1,28 +1,17 @@
 <div class="calendar-page">
   <aside class="sidebar">
     <h2>Classroom</h2>
-    <button class="menu-btn active">Calendar</button>
+
     <button class="menu-btn">Subjects</button>
     <button class="menu-btn">Tasks</button>
 
     <div class="agenda-box">
       <h3>Agenda</h3>
-      <h4>Today</h4>
-      <p *ngIf="getTodayTasks().length === 0" class="no-tasks">No tasks yet</p>
-      <div class="agenda-task" *ngFor="let task of getTodayTasks()" [style.border-left-color]="task.color"
-        (click)="openTaskEditor(task)">
-        {{ getFirstFiveWords(task.text) }}
-      </div>
-
-      <h4>Tomorrow</h4>
-      <p *ngIf="getTomorrowTasks().length === 0" class="no-tasks">No tasks yet</p>
-      <div class="agenda-task" *ngFor="let task of getTomorrowTasks()" [style.border-left-color]="task.color"
-        (click)="openTaskEditor(task)">
-        {{ getFirstFiveWords(task.text) }}
-      </div>
+      <p>Today: No tasks yet</p>
+      <p>Tomorrow: No tasks yet</p>
     </div>
 
-    <button class="logout-btn" (click)="logout()">Logout</button>
+    <button class="logout-btn">Logout</button>
   </aside>
 
   <main class="calendar-main">
@@ -33,68 +22,74 @@
     </div>
 
     <div class="weekdays">
-      <div class="weekday" *ngFor="let d of weekDays">{{ d }}</div>
+      <div class="weekday" *ngFor="let day of weekDays">
+        {{ day }}
+      </div>
     </div>
 
     <div class="calendar-grid">
-      <!-- START OF DAY LOOP -->
       <div class="calendar-cell" *ngFor="let day of calendarDays" [class.empty]="!day.isCurrentMonth"
-        [class.today]="day.isToday" (click)="selectDate(day)">
+        [class.today]="day.isToday">
+        <div class="day-number" *ngIf="day.dayNumber">
+          {{ day.dayNumber }}
+        </div>
 
-        <span class="day-number">{{ day.dayNumber }}</span>
-
-        <button *ngIf="selectedDay === day.dayNumber && day.dayNumber !== null" class="add-task-btn"
-          (click)="openAddTaskBox(); $event.stopPropagation()">
-          +
+        <button class="add-task-btn" *ngIf="day.dayNumber" (click)="openTaskBox(day.dayNumber)">
+          Add Task
         </button>
 
         <div class="task-list">
-          <div class="task-preview"
-            *ngFor="let task of (isDayExpanded(day.dayNumber) ? getTasksForDay(day.dayNumber) : getTasksForDay(day.dayNumber).slice(0, 3))"
-            [style.border-left-color]="task.color" (click)="openTaskEditor(task); $event.stopPropagation()">
-            {{ getFirstFiveWords(task.text) }}
+          <div class="task-item" *ngFor="let task of getTasksForDay(day.dayNumber)"
+            [style.background-color]="task.color" (click)="openTaskDetails(task)">
+            <span class="task-time" *ngIf="getTaskTimeDisplay(task)">
+              {{ getTaskTimeDisplay(task) }}
+            </span>
+
+            <span>
+              {{ getShortTaskText(task.text) }}
+            </span>
           </div>
         </div>
-
-        <button class="more-tasks-btn" *ngIf="getTasksForDay(day.dayNumber).length > 3"
-          (click)="toggleMoreTasks(day.dayNumber); $event.stopPropagation()">
-          {{ isDayExpanded(day.dayNumber) ? 'Less' : '...' }}
-        </button>
-
-        <!-- NEW TASK BOX (Only shows when adding) -->
-        <div class="task-box" *ngIf="showTaskBox && selectedDay === day.dayNumber" (click)="$event.stopPropagation()">
-          <h4>New Task</h4>
-          <textarea [(ngModel)]="newTaskText" placeholder="Add a new task..."></textarea>
-          <div class="box-actions">
-            <select [(ngModel)]="selectedColor">
-              <option *ngFor="let color of colorOptions" [value]="color">{{ color }}</option>
-            </select>
-            <button class="save-btn" (click)="addTask()">Save</button>
-          </div>
-        </div>
-
-        <!-- EDIT/DELETE TASK BOX (Must be inside calendar-cell to access 'day') -->
-        <div class="task-box" *ngIf="showEditBox && selectedTask && selectedTask.day === day.dayNumber"
-          (click)="$event.stopPropagation()">
-          <h4>Edit Task</h4>
-          <textarea [(ngModel)]="editedTaskText" placeholder="Edit task..."></textarea>
-          <div class="box-actions">
-            <select [(ngModel)]="editedTaskColor">
-              <option *ngFor="let color of colorOptions" [value]="color">{{ color }}</option>
-            </select>
-            <button class="save-btn" (click)="saveEditedTask()">Save</button>
-            <button class="delete-btn" (click)="deleteTask()"
-              style="background-color: #ff4d4d; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">
-              Delete
-            </button>
-          </div>
-          <button (click)="cancelEdit()"
-            style="background: none; border: none; color: gray; cursor: pointer; margin-top: 10px; font-size: 0.8em;">
-            Cancel
-          </button>
-        </div>
-
       </div>
     </div>
   </main>
+</div>
+
+<div class="task-modal" *ngIf="showTaskBox">
+  <div class="task-box">
+    <h2>{{ selectedTask ? 'Edit Task' : 'Add Task' }}</h2>
+
+    <label>Category</label>
+    <input type="text" [(ngModel)]="newTaskCategory" placeholder="Example: Work" />
+
+    <label>Start Time</label>
+    <input type="time" [(ngModel)]="newTaskStartTime" />
+
+    <label>End Time</label>
+    <input type="time" [(ngModel)]="newTaskEndTime" />
+
+    <label>Task</label>
+    <textarea [(ngModel)]="newTaskText" placeholder="Write your task here"></textarea>
+
+    <label>Color</label>
+    <select [(ngModel)]="newTaskColor">
+      <option *ngFor="let color of colorOptions" [value]="color">
+        {{ color }}
+      </option>
+    </select>
+
+    <div class="task-buttons">
+      <button *ngIf="!selectedTask" (click)="addTask()">Save Task</button>
+
+      <button *ngIf="selectedTask" (click)="saveEditedTask()">
+        Save Changes
+      </button>
+
+      <button *ngIf="selectedTask" class="delete-btn" (click)="deleteTask()">
+        Delete Task
+      </button>
+
+      <button (click)="closeTaskBox()">Cancel</button>
+    </div>
+  </div>
 </div>
