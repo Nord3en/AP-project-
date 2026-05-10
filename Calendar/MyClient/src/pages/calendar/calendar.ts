@@ -37,7 +37,10 @@ export class CalendarComponent {
   tasks: CalendarTask[] = [];
 
   selectedDay: number | null = null;
+  selectedTask: CalendarTask | null = null;
+
   showTaskBox: boolean = false;
+  isEditingTask: boolean = false;
 
   newTaskCategory: string = '';
   newTaskText: string = '';
@@ -45,25 +48,23 @@ export class CalendarComponent {
   newTaskStartTime: string = '';
   newTaskEndTime: string = '';
 
-  colorOptions: string[] = [
-    'black',
-    'red',
-    'orange',
-    'yellow',
-    'blue',
-    'purple',
-    'pink',
-    'brown'
-  ];
-
-  selectedTask: CalendarTask | null = null;
-  isEditingTask: boolean = false;
-
   editTaskCategory: string = '';
   editTaskText: string = '';
   editTaskColor: string = 'black';
   editTaskStartTime: string = '';
   editTaskEndTime: string = '';
+
+  colorOptions: string[] = [
+    'black',
+    'red',
+    'orange',
+    'yellow',
+    'green',
+    'blue',
+    'purple',
+    'pink',
+    'brown'
+  ];
 
   ngOnInit(): void {
     this.loadTasks();
@@ -97,15 +98,13 @@ export class CalendarComponent {
     }
 
     for (let day = 1; day <= daysInMonth; day++) {
-      const isToday =
-        day === today.getDate() &&
-        month === today.getMonth() &&
-        year === today.getFullYear();
-
       this.calendarDays.push({
         dayNumber: day,
         isCurrentMonth: true,
-        isToday: isToday
+        isToday:
+          day === today.getDate() &&
+          month === today.getMonth() &&
+          year === today.getFullYear()
       });
     }
 
@@ -149,6 +148,8 @@ export class CalendarComponent {
 
     this.selectedDay = day;
     this.showTaskBox = true;
+    this.selectedTask = null;
+
     this.newTaskCategory = '';
     this.newTaskText = '';
     this.newTaskColor = 'black';
@@ -159,6 +160,7 @@ export class CalendarComponent {
   closeTaskBox(): void {
     this.showTaskBox = false;
     this.selectedDay = null;
+
     this.newTaskCategory = '';
     this.newTaskText = '';
     this.newTaskColor = 'black';
@@ -178,7 +180,7 @@ export class CalendarComponent {
       startTime: this.newTaskStartTime,
       endTime: this.newTaskEndTime,
       day: this.selectedDay,
-      month: this.currentDate.getMonth(),
+      month: this.currentDate.getMonth() + 1,
       year: this.currentDate.getFullYear()
     };
 
@@ -195,10 +197,12 @@ export class CalendarComponent {
     return this.tasks
       .filter(task =>
         task.day === day &&
-        task.month === this.currentDate.getMonth() &&
+        task.month === this.currentDate.getMonth() + 1 &&
         task.year === this.currentDate.getFullYear()
       )
-      .sort((a, b) => this.convertTimeToMinutes(a.startTime) - this.convertTimeToMinutes(b.startTime));
+      .sort((a, b) =>
+        this.convertTimeToMinutes(a.startTime) - this.convertTimeToMinutes(b.startTime)
+      );
   }
 
   convertTimeToMinutes(time: string): number {
@@ -240,6 +244,7 @@ export class CalendarComponent {
   closeTaskDetails(): void {
     this.selectedTask = null;
     this.isEditingTask = false;
+
     this.editTaskCategory = '';
     this.editTaskText = '';
     this.editTaskColor = 'black';
@@ -287,6 +292,35 @@ export class CalendarComponent {
     this.tasks = this.tasks.filter(task => task !== this.selectedTask);
     this.saveTasks();
     this.closeTaskDetails();
+  }
+
+  getTodayTasks(): CalendarTask[] {
+    const today = new Date();
+
+    return this.tasks
+      .filter(task =>
+        task.day === today.getDate() &&
+        task.month === today.getMonth() + 1 &&
+        task.year === today.getFullYear()
+      )
+      .sort((a, b) =>
+        this.convertTimeToMinutes(a.startTime) - this.convertTimeToMinutes(b.startTime)
+      );
+  }
+
+  getTomorrowTasks(): CalendarTask[] {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    return this.tasks
+      .filter(task =>
+        task.day === tomorrow.getDate() &&
+        task.month === tomorrow.getMonth() + 1 &&
+        task.year === tomorrow.getFullYear()
+      )
+      .sort((a, b) =>
+        this.convertTimeToMinutes(a.startTime) - this.convertTimeToMinutes(b.startTime)
+      );
   }
 
   saveTasks(): void {

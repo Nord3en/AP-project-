@@ -7,9 +7,34 @@
 
     <div class="agenda-box">
       <h3>Agenda</h3>
-      <p>Today: No tasks yet</p>
-      <p>Tomorrow: No tasks yet</p>
+
+      <div class="agenda-section">
+        <h4>Today</h4>
+
+        <p *ngIf="getTodayTasks().length === 0">No tasks for today</p>
+
+        <div *ngFor="let task of getTodayTasks()" class="agenda-task" (click)="openTaskDetails(task)">
+          <span *ngIf="getTaskTimeDisplay(task)">
+            {{ getTaskTimeDisplay(task) }}
+          </span>
+          {{ task.text }}
+        </div>
+      </div>
+
+      <div class="agenda-section">
+        <h4>Tomorrow</h4>
+
+        <p *ngIf="getTomorrowTasks().length === 0">No tasks for tomorrow</p>
+
+        <div *ngFor="let task of getTomorrowTasks()" class="agenda-task" (click)="openTaskDetails(task)">
+          <span *ngIf="getTaskTimeDisplay(task)">
+            {{ getTaskTimeDisplay(task) }}
+          </span>
+          {{ task.text }}
+        </div>
+      </div>
     </div>
+
 
     <button class="logout-btn">Logout</button>
   </aside>
