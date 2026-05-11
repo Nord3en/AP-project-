@@ -1,11 +1,11 @@
 .app-banner {
   /* A very tight transition between two close shades of purple */
-  background: linear-gradient(180deg, #7e57c2 0%, #673ab7 100%);
-  height: 180px; 
+  background: linear-gradient(180deg, #ab93d4 0%, #673ab7 100%);
+  height: 110px; 
   width: 100%;
   position: relative;
   margin-bottom: 0px;
-  border-bottom: 3px solid #5e35b1; /* Subtle dark anchor line */
+  border-bottom: 0px solid #5e35b1; /* Subtle dark anchor line */
 }
 
 .banner-overlay {
@@ -26,6 +26,7 @@
   text-transform: uppercase;
   letter-spacing: 2px;
   text-shadow: 0 2px 4px rgba(0,0,0,0.2); /* Helps text pop against the purple */
+  
 }
 
 .banner-content h1 span {
