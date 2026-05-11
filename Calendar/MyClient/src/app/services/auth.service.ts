@@ -16,28 +16,27 @@ export interface User {
 export class AuthService {
   private http = inject(HttpClient);
 
-  // REMEMBER: Change 5208 to your actual C# port if it ever changes!
   private backendUrl = 'http://localhost:5208/api/Users';
 
-  // 📝 1. The Registration Method
+  // the registration method
   register(newUser: User) {
     // We "POST" (send) the newUser data to the C# window
     return this.http.post(`${this.backendUrl}/register`, newUser);
   }
 
-  // 🔐 2. The Login Method
+  // he login method
   login(email: string, passhash: string) {
     const loginData = { email: email, passhash: passhash };
 
-    // Notice the third parameter here! We are telling Angular to accept the cookie.
+    // telling Angular to accept the cookie.
     return this.http.post(`http://localhost:5208/api/Users/login`, loginData, {
       withCredentials: true
     });
   }
 
-  // 🚪 3. The Logout Method (NEW!)
+  // 🚪 the Logout Method 
   logout() {
-    // We send an empty object {} because the backend just needs to know to destroy the cookie
+    // here we send an empty object {} because the backend just needs to know to destroy the cookie
     return this.http.post(`${this.backendUrl}/logout`, {}, {
       withCredentials: true
     });
@@ -45,9 +44,9 @@ export class AuthService {
   checkAuthStatus(): Observable<boolean> {
     // 🚪 Knock on the C# door, but this time, BRING THE COOKIE!
     return this.http.get('http://localhost:5208/api/Users/auth-status', {
-      withCredentials: true 
+      withCredentials: true
     }).pipe(
-      map(() => true), 
+      map(() => true),
       catchError(() => {
         return of(false);
       })
