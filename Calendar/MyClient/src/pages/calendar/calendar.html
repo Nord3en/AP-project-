@@ -2,7 +2,18 @@
   <aside class="sidebar">
     <h2>Classroom</h2>
 
-    <button class="menu-btn">Subjects</button>
+    <div class="subject-filter">
+      <button class="side-button">Subjects</button>
+
+      <select class="category-dropdown" [(ngModel)]="selectedCategory">
+        <option value="All">All Subjects</option>
+
+        <option *ngFor="let category of categories" [value]="category">
+          {{ category }}
+        </option>
+      </select>
+    </div>
+
     <button class="menu-btn">Tasks</button>
 
     <div class="agenda-box">
@@ -35,7 +46,6 @@
       </div>
     </div>
 
-
     <button class="logout-btn">Logout</button>
   </aside>
 
@@ -63,17 +73,13 @@
           Add Task
         </button>
 
-        <div class="task-list">
-          <div class="task-item" *ngFor="let task of getTasksForDay(day.dayNumber)"
-            [style.background-color]="task.color" (click)="openTaskDetails(task)">
-            <span class="task-time" *ngIf="getTaskTimeDisplay(task)">
-              {{ getTaskTimeDisplay(task) }}
-            </span>
+        <div class="task" *ngFor="let task of getTasksForDay(day.dayNumber)" [style.background-color]="task.color"
+          (click)="openEditTask(day.dayNumber, task)">
+          <span *ngIf="task.startTime">
+            {{ task.startTime }}
+          </span>
 
-            <span>
-              {{ getShortTaskText(task.text) }}
-            </span>
-          </div>
+          {{ getShortTaskText(task.text) }}
         </div>
       </div>
     </div>
