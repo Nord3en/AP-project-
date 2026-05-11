@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { AuthComponent } from '../pages/auth/auth';
 import { CalendarComponent } from '../pages/calendar/calendar';
 import { Register } from '../pages/register/register';
+import { ProfileComponent } from '../pages/Profile/profile';
 
 // 🛡️ 1. Import the Guard we just created!
 // (Adjust this path if you saved your guard somewhere else)
@@ -12,6 +13,7 @@ export const routes: Routes = [
     { path: '', redirectTo: 'login', pathMatch: 'full' },
     { path: 'login', component: AuthComponent },
     { path: 'register', component: Register },
+    { path: 'profile', component: ProfileComponent },
 
     // App pages
     { 

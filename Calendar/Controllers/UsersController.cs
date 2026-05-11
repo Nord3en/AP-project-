@@ -25,13 +25,82 @@ namespace Calendar.Controllers
             _context = context;
         }
 
+// GET: api/Users/me
+[HttpGet("me")]
+[Authorize]
+public async Task<ActionResult<object>> GetMe()
+{
+    // The Bouncer identifies who is calling based on the cookie
+    var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+    var user = await _context.Users.FindAsync(userId);
+
+    if (user == null) return NotFound();
+
+    // We only return what's necessary (don't send the password hash back!)
+    return Ok(new { name = user.Name, email = user.Email });
+}
+
+// PUT: api/Users/me
+[HttpPut("me")]
+[Authorize]
+public async Task<IActionResult> UpdateMe(UpdateProfileRequest request)
+{
+    var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+    var user = await _context.Users.FindAsync(userId);
+
+    if (user == null) return NotFound();
+
+    // Update Name and Email
+    user.Name = request.Name;
+    user.Email = request.Email;
+
+    // Only update password if a new one was actually provided
+    if (!string.IsNullOrEmpty(request.Password))
+    {
+        user.Passhash = BCrypt.Net.BCrypt.HashPassword(request.Password);
+    }
+
+    _context.Entry(user).State = EntityState.Modified;
+    await _context.SaveChangesAsync();
+
+    return NoContent();
+}
+
+// DELETE: api/Users/me
+[HttpDelete("me")]
+[Authorize]
+public async Task<IActionResult> DeleteMe()
+{
+    var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+    var user = await _context.Users.FindAsync(userId);
+
+    if (user == null) return NotFound();
+
+    // 1. Remove from Database
+    _context.Users.Remove(user);
+    await _context.SaveChangesAsync();
+
+    // 2. Kick them out (clear the cookie)
+    await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+    return Ok(new { message = "Account deleted and logged out." });
+}
+
+public class UpdateProfileRequest
+{
+    public string Name { get; set; }
+    public string Email { get; set; }
+    public string? Password { get; set; } // Optional password change
+}
+
+
         [HttpGet]
         public async Task<ActionResult<IEnumerable<User>>> GetUsers()
         {
             return await _context.Users.ToListAsync();
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id:int}")]
         public async Task<ActionResult<User>> GetUser(int id)
         {
             var user = await _context.Users.FindAsync(id);
@@ -39,7 +108,7 @@ namespace Calendar.Controllers
             return user;
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("{id:int}")]
         public async Task<IActionResult> PutUser(int id, User user)
         {
             if (id != user.Uid) return BadRequest();
@@ -113,7 +182,7 @@ namespace Calendar.Controllers
             return Ok(new { message = "Logged out successfully" });
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeleteUser(int id)
         {
             var user = await _context.Users.FindAsync(id);

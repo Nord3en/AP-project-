@@ -53,5 +53,15 @@ export class AuthService {
       })
     );
   }
+getMe(): Observable<any> {
+  return this.http.get(`${this.backendUrl}/me`, { withCredentials: true });
+}
 
+updateMe(data: any): Observable<any> {
+  return this.http.put(`${this.backendUrl}/me`, data, { withCredentials: true });
+}
+
+deleteMe(): Observable<any> {
+  return this.http.delete(`${this.backendUrl}/me`, { withCredentials: true });
+}
 }

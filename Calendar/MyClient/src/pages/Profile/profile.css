@@ -1,0 +1,120 @@
+/* Center everything on the screen */
+.profile-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #f4f4f9;
+    /* Light grey background like login */
+    font-family: 'Inter', sans-serif;
+}
+
+/* The White Card */
+.profile-card {
+    background: white;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    width: 100%;
+    max-width: 380px;
+    text-align: center;
+}
+
+h2 {
+    color: #333;
+    margin-bottom: 50px;
+    /* Increased from 30px to 50px */
+    font-size: 2rem;
+    font-weight: 100;
+    /* Optional: makes it pop like your login title */
+}
+
+/* Form Styling */
+.form-group {
+    text-align: left;
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 8px;
+}
+
+input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 1rem;
+    box-sizing: border-box;
+    /* Critical for centering */
+}
+
+/* The Purple Button (Matches Login) */
+.btn-save {
+    width: 100%;
+    background-color: #6b46c1;
+    /* That specific purple */
+    color: white;
+    padding: 14px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s;
+    margin-bottom: 25px;
+}
+
+.btn-save:hover {
+    background-color: #553c9a;
+}
+
+.btn-delete {
+    width: 100%;
+    background-color: #ffffff;
+    color: #6b46c1;
+    padding: 14px;
+    border: 1px solid #6b46c1;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s;
+    margin-bottom: 25px;
+}
+
+.btn-delete:hover {
+    background-color: #fff5f5;
+    color: #e53e3e;
+    border-color: #e53e3e;
+}
+
+.btn-back {
+    width: 100%;
+    background-color: #ffffff;
+    color: #6b46c1;
+    padding: 14px;
+    border: 1px solid #6b46c1;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s;
+    margin-bottom: 25px;
+}
+
+.btn-back:hover {
+    background-color: #e5e7eb;
+    color: #111827;
+}
+
+.back-link {
+    display: block;
+    margin-top: 20px;
+    color: #6b46c1;
+    text-decoration: none;
+    font-size: 0.9rem;
+}
