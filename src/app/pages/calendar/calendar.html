@@ -8,8 +8,26 @@
 
         <div class="agenda-box">
             <h3>Agenda</h3>
-            <p><strong>Today:</strong> No tasks yet</p>
-            <p><strong>Tomorrow:</strong> No tasks yet</p>
+
+            <div class="agenda-section">
+                <h4>Today</h4>
+                <p *ngIf="todayTasks.length === 0">No tasks yet</p>
+
+                <div class="agenda-task" *ngFor="let task of todayTasks" (click)="editTask(task)">
+                    <span>{{ task.startTime }}</span>
+                    {{ task.text }}
+                </div>
+            </div>
+
+            <div class="agenda-section">
+                <h4>Tomorrow</h4>
+                <p *ngIf="tomorrowTasks.length === 0">No tasks yet</p>
+
+                <div class="agenda-task" *ngFor="let task of tomorrowTasks" (click)="editTask(task)">
+                    <span>{{ task.startTime }}</span>
+                    {{ task.text }}
+                </div>
+            </div>
         </div>
 
         <button class="logout-btn">Logout</button>
@@ -31,8 +49,53 @@
         <div class="calendar-grid">
             <div class="calendar-cell" *ngFor="let day of calendarDays" [class.empty]="!day.isCurrentMonth"
                 [class.today]="day.isToday">
-                <span *ngIf="day.dayNumber">{{ day.dayNumber }}</span>
+                <div class="day-number" *ngIf="day.dayNumber">
+                    {{ day.dayNumber }}
+                </div>
+
+                <button class="add-task-btn" *ngIf="day.dayNumber" (click)="openAddTask(day.dayNumber)">
+                    Add Task
+                </button>
+
+                <div class="task" *ngFor="let task of getTasksForDay(day.dayNumber)"
+                    [style.backgroundColor]="task.color" (click)="editTask(task)">
+                    <span>{{ task.startTime }}</span>
+                    {{ task.text }}
+                </div>
             </div>
         </div>
     </main>
+</div>
+
+<div class="task-modal" *ngIf="showTaskBox">
+    <div class="task-box">
+        <h2>{{ editingTask ? 'Edit Task' : 'Add Task' }}</h2>
+
+        <label>Category</label>
+        <input type="text" [(ngModel)]="newCategory">
+
+        <label>Start Time</label>
+        <input type="time" [(ngModel)]="newStartTime">
+
+        <label>End Time</label>
+        <input type="time" [(ngModel)]="newEndTime">
+
+        <label>Task</label>
+        <textarea [(ngModel)]="newTaskText"></textarea>
+
+        <label>Color</label>
+        <input type="color" [(ngModel)]="newColor">
+
+        <div class="task-buttons">
+            <button (click)="addOrUpdateTask()">
+                {{ editingTask ? 'Save Changes' : 'Add Task' }}
+            </button>
+
+            <button class="delete-btn" *ngIf="editingTask" (click)="deleteTask()">
+                Delete
+            </button>
+
+            <button (click)="closeTaskBox()">Cancel</button>
+        </div>
+    </div>
 </div>
