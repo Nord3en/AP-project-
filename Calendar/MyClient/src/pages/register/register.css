@@ -1,7 +1,7 @@
 .auth-screen {
     height: 100vh;
     width: 100vw;
-    background-color: #dfb2b2;
+    background-color: #ededed;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -9,13 +9,13 @@
 }
 
 .register-card {
-    background-color: #d9d9d9;
-    border: 1px solid #999;
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
     border-radius: 8px;
     padding: 40px;
     width: 380px;
     text-align: center;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 .card-header {
@@ -52,7 +52,7 @@
 
 .signup-btn {
     width: 100%;
-    background-color: #4f46e5;
+    background-color: #673ab7;
     color: white;
     border: none;
     border-radius: 4px;
@@ -66,7 +66,7 @@
 }
 
 .signup-btn:hover {
-    background-color: #4338ca;
+    background-color: #5a30a0;
 }
 
 .footer-text {
@@ -77,9 +77,10 @@
 
 .login-btn {
     width: 100%;
-    background-color: white;
-    color: #4f46e5;
-    border: 1px solid #4f46e5;
+    background-color: #ffffff;
+    color: #673ab7;
+    border: 1px solid #673ab7;
+    ;
     border-radius: 4px;
     padding: 10px;
     font-weight: 600;
