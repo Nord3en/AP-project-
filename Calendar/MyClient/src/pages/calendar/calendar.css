@@ -6,6 +6,135 @@
   /* Light neutral background */
   font-family: 'Inter', sans-serif;
 }
+.task-box, .task-box *, .task-box *::before, .task-box *::after {
+    box-sizing: border-box; /* Includes padding in the width calculation */
+}
+
+/* --- Modal Overlay --- */
+.task-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5); /* Dim background */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    backdrop-filter: blur(2px); /* Modern blur effect */
+}
+
+/* --- Modal Content Box --- */
+.task-box {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    width: 450px; /* Fixed width for consistency */
+    max-width: 90%;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.task-box h2 {
+    margin: 0 0 10px 0;
+    font-size: 1.5rem;
+    color: #333;
+}
+
+/* --- Labels and Inputs --- */
+.task-box label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #666;
+    margin-bottom: -10px; /* Pull label closer to input */
+}
+
+.task-box input[type="text"],
+.task-box input[type="time"],
+.task-box select,
+.task-box textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.task-box input:focus, .task-box select:focus, .task-box textarea:focus {
+    border-color: #673ab7; /* Matches your theme color */
+}
+
+.task-box textarea {
+    height: 80px;
+    resize: none;
+}
+
+/* --- Inline Group (Times and Color) --- */
+/* We'll put times side-by-side to save vertical space */
+.time-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.color-group {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-top: 5px;
+}
+
+.task-box input[type="color"] {
+    width: 50px;
+    height: 35px;
+    border: none;
+    cursor: pointer;
+    background: none;
+}
+
+/* --- Buttons --- */
+.task-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.task-buttons button {
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: opacity 0.2s;
+}
+
+.task-buttons button:hover {
+    opacity: 0.9;
+}
+
+.save-btn {
+    background-color: #673ab7;
+    color: white;
+}
+
+.delete-btn {
+    background-color: #ef4444;
+    color: white;
+}
+
+/* --- Category Wrapper specifically --- */
+.category-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
 
 /* Sidebar Styling */
 .sidebar {

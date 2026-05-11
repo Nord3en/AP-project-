@@ -1,16 +1,19 @@
-import { Component,inject,ChangeDetectorRef } from '@angular/core';
+import { Component, inject, ChangeDetectorRef, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink,Router } from '@angular/router';
-import { AuthService } from '../../app/services/auth.service'; //ű
+import { RouterLink, Router } from '@angular/router';
+import { AuthService } from '../../app/services/auth.service';
 import { TasksService } from '../../app/api-client/api/tasks.service';
-
-
+import { SubjectsService } from '../../app/api-client/api/subjects.service'; // 👈 Fully activated!
 
 interface CalendarTask {
   id?: number; 
   text: string;
+  subid: number; 
+  category: string;
   color: string;
+  startTime: string; 
+  endTime: string;   
   day: number;
   month: number;
   year: number;
@@ -29,52 +32,53 @@ interface CalendarDay {
   templateUrl: './calendar.html',
   styleUrls: ['./calendar.css']
 })
-export class CalendarComponent {
+export class CalendarComponent implements OnInit {
 
-
-  
   private authService = inject(AuthService);
   private router = inject(Router);
   private tasksApi = inject(TasksService);
+  private subjectsApi = inject(SubjectsService); // 👈 Injected!
   private cdr = inject(ChangeDetectorRef);
+  
   weekDays: string[] = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
-  currentDate: Date = new Date(2026, 3, 1);
+  currentDate: Date = new Date();
   monthName: string = '';
   year: number = 0;
   calendarDays: CalendarDay[] = [];
 
-  selectedDay: number | null = null;
-  showTaskBox: boolean = false;
-  newTaskText: string = '';
-  selectedColor: string = 'black';
-
-  colorOptions: string[] = [
-    'red', 'blue', 'green', 'purple', 'pink', 'orange', 'brown', 'black'
-  ];
-
   tasks: CalendarTask[] = [];
+  subjects: any[] = []; // Using any to flexibly handle the C# generated model
+  
+  expandedDay: number | null = null;
+  selectedDay: number | null = null;
+
+  showTaskModal: boolean = false;
+  isEditing: boolean = false;
+  selectedTask: CalendarTask | null = null;
+
+  // Form Bindings
+  newCategory: string = '';
+  newTaskText: string = '';
+  newColor: string = '#673ab7';
+  newStartTime: string = '09:00';
+  newEndTime: string = '10:00';
+
+  ngOnInit(): void {
+    this.buildCalendar();
+    this.loadSubjectsAndTasks(); 
+  }
 
   logout(): void {
     this.authService.logout().subscribe({
-      next: () => {
-        console.log('Logged out successfully');
-        this.router.navigate(['/auth']); 
-      },
-      error: (err) => {
-        console.error('Logout failed', err);
-      }
+      next: () => this.router.navigate(['/auth']),
+      error: (err) => console.error('Logout failed', err)
     });
   }
- ngOnInit(): void {
-  this.loadTasks();
-  this.buildCalendar();
-}
 
   buildCalendar(): void {
     const year = this.currentDate.getFullYear();
     const month = this.currentDate.getMonth();
-
     this.monthName = this.currentDate.toLocaleString('en-US', { month: 'long' });
     this.year = year;
 
@@ -90,127 +94,131 @@ export class CalendarComponent {
     this.calendarDays = [];
 
     for (let i = 0; i < startDay; i++) {
-      this.calendarDays.push({
-        dayNumber: null,
-        isCurrentMonth: false,
-        isToday: false
-      });
+      this.calendarDays.push({ dayNumber: null, isCurrentMonth: false, isToday: false });
     }
 
     for (let day = 1; day <= daysInMonth; day++) {
-      const isToday =
-        day === today.getDate() &&
-        month === today.getMonth() &&
-        year === today.getFullYear();
-
-      this.calendarDays.push({
-        dayNumber: day,
-        isCurrentMonth: true,
-        isToday: isToday
-      });
+      const isToday = day === today.getDate() && month === today.getMonth() && year === today.getFullYear();
+      this.calendarDays.push({ dayNumber: day, isCurrentMonth: true, isToday: isToday });
     }
 
     while (this.calendarDays.length < 42) {
-      this.calendarDays.push({
-        dayNumber: null,
-        isCurrentMonth: false,
-        isToday: false
-      });
+      this.calendarDays.push({ dayNumber: null, isCurrentMonth: false, isToday: false });
     }
   }
 
   previousMonth(): void {
-    this.currentDate = new Date(
-      this.currentDate.getFullYear(),
-      this.currentDate.getMonth() - 1,
-      1
-    );
+    this.currentDate = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth() - 1, 1);
     this.selectedDay = null;
-    this.showTaskBox = false;
     this.buildCalendar();
   }
 
   nextMonth(): void {
-    this.currentDate = new Date(
-      this.currentDate.getFullYear(),
-      this.currentDate.getMonth() + 1,
-      1
-    );
+    this.currentDate = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth() + 1, 1);
     this.selectedDay = null;
-    this.showTaskBox = false;
     this.buildCalendar();
   }
 
   selectDate(day: CalendarDay): void {
-    if (day.dayNumber === null) {
-      return;
+    if (day.dayNumber !== null) {
+      this.selectedDay = day.dayNumber;
     }
-
-    this.selectedDay = day.dayNumber;
-    this.showTaskBox = false;
   }
 
   openAddTaskBox(): void {
-    this.showTaskBox = true;
+    this.isEditing = false;
+    this.selectedTask = null;
+    this.selectedSubjectName = ''
+    this.newCategory = '';
     this.newTaskText = '';
-    this.selectedColor = 'black';
+    this.newColor = '#673ab7';
+    this.newStartTime = '09:00';
+    this.newEndTime = '10:00';
+    
+    this.showTaskModal = true;
   }
 
+  openTaskEditor(task: CalendarTask): void {
+    this.isEditing = true;
+    this.selectedTask = task;
+    this.selectedDay = task.day;
+    this.selectedSubjectName = task.category;
+    this.newTaskText = task.text;
+    this.newCategory = task.category;
+    this.newColor = task.color;
+    this.newStartTime = task.startTime;
+    this.newEndTime = task.endTime;
 
-  getTasksForDay(dayNumber: number | null): CalendarTask[] {
-    if (dayNumber === null) {
-      return [];
+    this.showTaskModal = true;
+  }
+
+  
+  selectedSubjectName: string = '';
+
+isExistingCategory(): boolean {
+    return this.selectedSubjectName !== '';
+  }
+
+  onSubjectChange(): void {
+    if (this.isExistingCategory()) {
+      const subject = this.subjects.find(s => s.name === this.selectedSubjectName);
+      if (subject) {
+        this.newColor = subject.colorCode || subject.color_code;
+        this.newCategory = subject.name;
+      }
+    } else {
+      // Reset for "Create New"
+      this.newCategory = '';
+      this.newColor = '#673ab7';
     }
-
-    return this.tasks.filter(task =>
-      task.day === dayNumber &&
-      task.month === this.currentDate.getMonth() &&
-      task.year === this.currentDate.getFullYear()
-    );
+  }
+  closeModal(): void {
+    this.showTaskModal = false;
+    this.selectedTask = null;
+    this.isEditing = false;
   }
 
-  getFirstFiveWords(text: string): string {
-    return text.split(' ').slice(0, 5).join(' ');
+  
+  // --- 📡 REAL API CALLS ---
+
+  loadSubjectsAndTasks(): void {
+    this.subjectsApi.apiSubjectsGet().subscribe({
+      next: (dbSubjects: any[]) => {
+        this.subjects = dbSubjects; // Save the raw subjects from the database
+        this.loadTasks(); // Only load tasks AFTER subjects are ready
+      },
+      error: (err) => {
+        console.error('Failed to load subjects', err);
+        this.loadTasks(); // Fallback: load tasks anyway if subjects fail
+      }
+    });
   }
-
-  openFullTask(task: CalendarTask): void {
-    alert(task.text);
-  }
-  selectedTask: CalendarTask | null = null;
-editedTaskText: string = '';
-editedTaskColor: string = 'black';
-showEditBox: boolean = false;
-
-openTaskEditor(task: CalendarTask): void {
-  this.selectedTask = task;
-  this.editedTaskText = task.text;
-  this.editedTaskColor = task.color;
-  this.showEditBox = true;
-}
-
-// --- 📡 DATABASE CONNECTED METHODS ---
 
   loadTasks(): void {
     this.tasksApi.apiTasksGet().subscribe({
       next: (dbTasks: any[]) => {
-        // Map the backend tasks to your frontend format
         this.tasks = dbTasks.map(dbTask => {
             
-            // Extract the color out of the source column!
-            let extractedColor = 'black';
-            if (dbTask.source && dbTask.source.includes('|')) {
-                extractedColor = dbTask.source.split('|')[1];
-            }
+            // Relational mapping: Match the Task's subid to our Subjects array
+            const matchedSubject = this.subjects.find(s => s.subid === dbTask.subid);
+            const computedColor = matchedSubject ? (matchedSubject.colorCode || matchedSubject.color_code) : '#333333';
+            const computedCategory = matchedSubject ? matchedSubject.name : 'Uncategorized';
 
-            const taskDate = new Date(dbTask.startTime);
+            const taskStartDate = new Date(dbTask.startTime);
+            const taskEndDate = new Date(dbTask.endTime);
+            const formatTime = (d: Date) => d.toTimeString().substring(0, 5);
 
             return {
-                id: dbTask.id, // 👈 Save the DB ID so we can edit/delete it later!
+                id: dbTask.id, 
                 text: dbTask.title,
-                color: extractedColor,
-                day: taskDate.getDate(),
-                month: taskDate.getMonth(),
-                year: taskDate.getFullYear()
+                subid: dbTask.subid,
+                category: computedCategory,
+                color: computedColor, 
+                startTime: formatTime(taskStartDate),
+                endTime: formatTime(taskEndDate),
+                day: taskStartDate.getDate(),
+                month: taskStartDate.getMonth(),
+                year: taskStartDate.getFullYear()
             };
         });
         this.cdr.detectChanges();
@@ -219,150 +227,129 @@ openTaskEditor(task: CalendarTask): void {
     });
   }
 
+  filterSubid: number | null = null;
 
-  // CRUD methods ____________________________________________________________________
+onFilterChange(): void {
+  this.cdr.detectChanges(); // Force UI to refresh
+}
+  saveTask(): void {
+    const categoryName = this.isExistingCategory() ? this.selectedSubjectName : this.newCategory;
+    if (this.newTaskText.trim() === '' || categoryName.trim() === '') return;
 
-  addTask(): void {
-    if (this.selectedDay === null || this.newTaskText.trim() === '') {
-      return;
-    }
+    const existingSubject = this.subjects.find(
+      s => s.name.toLowerCase() === categoryName.trim().toLowerCase()
+    );
 
-    const year = this.currentDate.getFullYear();
-    const month = this.currentDate.getMonth();
-    const day = this.selectedDay;
+    if (existingSubject) {
+      const subjectId = existingSubject.subid || existingSubject.id;
+      const oldColor = existingSubject.colorCode || existingSubject.color_code;
 
-    const startTime = new Date(year, month, day, 0, 0, 0);
-    const endTime = new Date(year, month, day, 23, 59, 59);
-
-    const newTask: any = { 
-      title: this.newTaskText,           
-      description: "", 
-      startTime: startTime.toISOString(), 
-      endTime: endTime.toISOString(),
-      isCompleted: false,                
-      source: `Angular|${this.selectedColor}` // 👈 Smuggle the color!
-    };
-
-    this.tasksApi.apiTasksPost(newTask).subscribe({
-      next: (savedTask: any) => {
-        let extractedColor = 'black';
-        if (savedTask.source && savedTask.source.includes('|')) {
-            extractedColor = savedTask.source.split('|')[1];
-        }
-
-        this.tasks.push({
-           id: savedTask.id, // 👈 Capture the brand new ID generated by PostgreSQL
-           text: savedTask.title,
-           color: extractedColor, 
-           day: day,
-           month: month,
-           year: year
-        }); 
+      // Check if the user changed the color of the existing category
+      if (this.newColor !== oldColor) {
+        const updatedSubject = { ...existingSubject, colorCode: this.newColor };
         
-        this.newTaskText = '';
-        this.selectedColor = 'black';
-        this.showTaskBox = false;
-        this.loadTasks()
-      },
-      error: (err) => console.error('Failed to save task', err)
-    });
+        // 1. Update the Category color in the DB (PUT)
+        this.subjectsApi.apiSubjectsIdPut(subjectId, updatedSubject).subscribe({
+          next: () => {
+            // Update local array so the calendar colors change immediately
+            existingSubject.colorCode = this.newColor;
+            existingSubject.color_code = this.newColor;
+            this.executeTaskSave(subjectId);
+          },
+          error: (err) => console.error('Failed to update category color', err)
+        });
+      } else {
+        // No color change, just save the task
+        this.executeTaskSave(subjectId);
+      }
+    } else {
+      // 2. It's a brand new category (POST)
+      const newSubjectPayload: any = {
+        name: categoryName.trim(),
+        colorCode: this.newColor
+      };
+
+      this.subjectsApi.apiSubjectsPost(newSubjectPayload).subscribe({
+        next: (createdSubject: any) => {
+          this.subjects.push(createdSubject);
+          this.executeTaskSave(createdSubject.subid || createdSubject.id);
+        },
+        error: (err) => console.error('Failed to create new category', err)
+      });
+    }
   }
 
-  saveEditedTask(): void {
-    // If we don't have a task, or the task doesn't have an ID, we can't update it!
-    if (this.selectedTask === null || !this.selectedTask.id) {
-      console.error("Cannot update task: Missing database ID!");
-      return;
-    }
+  executeTaskSave(validSubid: number): void {
+    const dayToSave = this.isEditing && this.selectedTask ? this.selectedTask.day : this.selectedDay;
+    if (dayToSave === null) return;
 
-    // Reconstruct the strict database time formats
     const year = this.currentDate.getFullYear();
     const month = this.currentDate.getMonth();
-    const day = this.selectedTask.day;
-    const startTime = new Date(year, month, day, 0, 0, 0);
-    const endTime = new Date(year, month, day, 23, 59, 59);
 
-    const updatedTask: any = { 
-      id: this.selectedTask.id, // Must pass the ID back to C#
-      title: this.editedTaskText,           
+    const [startH, startM] = this.newStartTime.split(':').map(Number);
+    const [endH, endM] = this.newEndTime.split(':').map(Number);
+
+    const startDate = new Date(year, month, dayToSave, startH || 0, startM || 0, 0);
+    const endDate = new Date(year, month, dayToSave, endH || 23, endM || 59, 59);
+
+    const payload: any = { 
+      title: this.newTaskText,          
       description: "", 
-      startTime: startTime.toISOString(), 
-      endTime: endTime.toISOString(),
+      startTime: startDate.toISOString(), 
+      endTime: endDate.toISOString(),
       isCompleted: false,                
-      source: `Angular|${this.editedTaskColor}` // 👈 Smuggle the NEW color!
+      subid: validSubid,  // 👈 Passing the verified relational ID
+      source: "Angular"   // No more smuggling!
     };
 
-    // UPDATE: Tell C# to modify the task with this specific ID
-    this.tasksApi.apiTasksIdPut(this.selectedTask.id, updatedTask).subscribe({
-      next: () => {
-        // Success! Update the UI to match
-        this.selectedTask!.text = this.editedTaskText;
-        this.selectedTask!.color = this.editedTaskColor;
-        this.showEditBox = false;
-        this.selectedTask = null;
-        this.loadTasks();
-      },
-      error: (err) => console.error('Failed to update task', err)
-    });
+    if (this.isEditing && this.selectedTask?.id) {
+      payload.id = this.selectedTask.id;
+      this.tasksApi.apiTasksIdPut(this.selectedTask.id, payload).subscribe({
+        next: () => {
+          this.closeModal();
+          this.loadSubjectsAndTasks(); // Reload everything to ensure sync
+        },
+        error: (err) => console.error('Failed to update task', err)
+      });
+    } else {
+      this.tasksApi.apiTasksPost(payload).subscribe({
+        next: () => {
+          this.closeModal();
+          this.loadSubjectsAndTasks(); // Reload everything to ensure sync
+        },
+        error: (err) => console.error('Failed to save task', err)
+      });
+    }
   }
 
   deleteTask(): void {
-    // If we don't know the DB ID, we can't delete it
-    if (this.selectedTask === null || !this.selectedTask.id) {
-      console.error("Cannot delete task: Missing database ID!");
-      return;
-    }
+    if (!this.selectedTask?.id) return;
 
-    // DELETE: Tell C# to wipe this ID from PostgreSQL
     this.tasksApi.apiTasksIdDelete(this.selectedTask.id).subscribe({
       next: () => {
-        // Success! Remove it from the Angular array
-        this.tasks = this.tasks.filter(task => task.id !== this.selectedTask!.id);
-        this.showEditBox = false;
-        this.selectedTask = null;
+        this.closeModal();
+        this.loadTasks();
       },
       error: (err) => console.error('Failed to delete task', err)
     });
   }
 
-// end of  CRUD methods ___________________________________________________________
-
-cancelEdit(): void {
-  this.showEditBox = false;
-  this.selectedTask = null;
-}
-expandedDay: number | null = null;
-
-isDayExpanded(dayNumber: number | null): boolean {
-  return this.expandedDay === dayNumber;
-}
-
-toggleMoreTasks(dayNumber: number | null): void {
-  if (dayNumber === null) {
-    return;
-  }
-
-  this.expandedDay = this.expandedDay === dayNumber ? null : dayNumber;
-}
-
-getTasksForSpecificDate(date: Date): CalendarTask[] {
+  // --- UTILITIES ---
+  isDayExpanded(dayNumber: number | null): boolean { return this.expandedDay === dayNumber; }
+  toggleMoreTasks(dayNumber: number | null): void { if (dayNumber !== null) this.expandedDay = this.expandedDay === dayNumber ? null : dayNumber; }
+  getTasksForDay(dayNumber: number | null): CalendarTask[] {
+  if (dayNumber === null) return [];
+  
   return this.tasks.filter(task =>
-    task.day === date.getDate() &&
-    task.month === date.getMonth() &&
-    task.year === date.getFullYear()
+    task.day === dayNumber &&
+    task.month === this.currentDate.getMonth() &&
+    task.year === this.currentDate.getFullYear() &&
+    // 👈 The Filter: Only show if no filter is set OR if the IDs match
+    (this.filterSubid === null || task.subid === this.filterSubid)
   );
 }
-
-getTodayTasks(): CalendarTask[] {
-  const today = new Date();
-  return this.getTasksForSpecificDate(today);
-}
-
-getTomorrowTasks(): CalendarTask[] {
-  const tomorrow = new Date();
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  return this.getTasksForSpecificDate(tomorrow);
-}
-
-
+  getFirstFiveWords(text: string): string { return text.split(' ').slice(0, 5).join(' '); }
+  getTasksForSpecificDate(date: Date): CalendarTask[] { return this.tasks.filter(task => task.day === date.getDate() && task.month === date.getMonth() && task.year === date.getFullYear()); }
+  getTodayTasks(): CalendarTask[] { return this.getTasksForSpecificDate(new Date()); }
+  getTomorrowTasks(): CalendarTask[] { const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1); return this.getTasksForSpecificDate(tomorrow); }
 }

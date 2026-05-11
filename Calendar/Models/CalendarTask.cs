@@ -10,7 +10,8 @@ public partial class CalendarTask
     public int Id { get; set; }
 
     public int UserId { get; set; }
-
+    
+[JsonPropertyName("subid")]
     public int? Subid { get; set; }
 
     public string Title { get; set; } = null!;
