@@ -47,7 +47,7 @@ export class CalendarComponent implements OnInit {
   calendarDays: CalendarDay[] = [];
 
   tasks: CalendarTask[] = [];
-  subjects: any[] = []; // Using any to flexibly handle the C# generated model
+  subjects: any[] = [];
   
   expandedDay: number | null = null;
   selectedDay: number | null = null;
@@ -55,8 +55,6 @@ export class CalendarComponent implements OnInit {
   showTaskModal: boolean = false;
   isEditing: boolean = false;
   selectedTask: CalendarTask | null = null;
-
-  // Form Bindings
   newCategory: string = '';
   newTaskText: string = '';
   newColor: string = '#673ab7';
