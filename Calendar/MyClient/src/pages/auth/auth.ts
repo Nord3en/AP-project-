@@ -1,4 +1,4 @@
-import { Component,inject } from '@angular/core';
+import { Component,inject,ChangeDetectorRef } from '@angular/core';
 import { RouterLink,Router } from '@angular/router';
 import { FormsModule } from '@angular/forms'; 
 import { CommonModule } from '@angular/common';
@@ -14,6 +14,7 @@ export class AuthComponent {
 
   private authService = inject(AuthService);
   private router = inject(Router);
+  private cdr = inject(ChangeDetectorRef);
   email = '';
   password = '';
   errorMessage='';
@@ -37,10 +38,13 @@ export class AuthComponent {
         // Catch the 400 Bad Request or 401 Unauthorized from your C# API
         if (err.status === 400 || err.status === 401) {
             this.errorMessage = 'Login failed. Incorrect email or password.';
+            this.cdr.detectChanges();
         } else if (err.status === 0) {
             this.errorMessage = 'Cannot connect to the server.';
+            this.cdr.detectChanges();
         } else {
             this.errorMessage = 'An unexpected error occurred. Please try again.';
+            this.cdr.detectChanges();
         }
       }
     });

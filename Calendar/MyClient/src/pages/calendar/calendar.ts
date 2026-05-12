@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink, Router } from '@angular/router';
 import { AuthService } from '../../app/services/auth.service';
 import { TasksService } from '../../app/api-client/api/tasks.service';
-import { SubjectsService } from '../../app/api-client/api/subjects.service'; // 👈 Fully activated!
+import { SubjectsService } from '../../app/api-client/api/subjects.service';
 
 interface CalendarTask {
   id?: number; 
@@ -37,7 +37,7 @@ export class CalendarComponent implements OnInit {
   private authService = inject(AuthService);
   private router = inject(Router);
   private tasksApi = inject(TasksService);
-  private subjectsApi = inject(SubjectsService); // 👈 Injected!
+  private subjectsApi = inject(SubjectsService);
   private cdr = inject(ChangeDetectorRef);
   weekDays: string[] = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
