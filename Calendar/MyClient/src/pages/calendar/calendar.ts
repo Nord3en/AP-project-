@@ -180,17 +180,17 @@ isExistingCategory(): boolean {
   }
 
   
-  // --- 📡 REAL API CALLS ---
+  //_________________ API CALLS______________-
 
   loadSubjectsAndTasks(): void {
     this.subjectsApi.apiSubjectsGet().subscribe({
       next: (dbSubjects: any[]) => {
-        this.subjects = dbSubjects; // Save the raw subjects from the database
-        this.loadTasks(); // Only load tasks AFTER subjects are ready
+        this.subjects = dbSubjects; 
+        this.loadTasks();
       },
       error: (err) => {
         console.error('Failed to load subjects', err);
-        this.loadTasks(); // Fallback: load tasks anyway if subjects fail
+        this.loadTasks(); 
       }
     });
   }
@@ -199,8 +199,6 @@ isExistingCategory(): boolean {
     this.tasksApi.apiTasksGet().subscribe({
       next: (dbTasks: any[]) => {
         this.tasks = dbTasks.map(dbTask => {
-            
-            // Relational mapping: Match the Task's subid to our Subjects array
             const matchedSubject = this.subjects.find(s => s.subid === dbTask.subid);
             const computedColor = matchedSubject ? (matchedSubject.colorCode || matchedSubject.color_code) : '#333333';
             const computedCategory = matchedSubject ? matchedSubject.name : 'Uncategorized';
@@ -231,14 +229,12 @@ isExistingCategory(): boolean {
   filterSubid: number | null = null;
 
 onFilterChange(): void {
-  this.cdr.detectChanges(); // Force UI to refresh
+  this.cdr.detectChanges();
 }
       saveTask(): void {
-    this.errorMessage = ''; // Clear previous errors
+    this.errorMessage = '';
 
     const categoryName = this.isExistingCategory() ? this.selectedSubjectName : this.newCategory;
-    
-    // 1. Check for empty fields and warn the user!
     if (this.newTaskText.trim() === '' || categoryName.trim() === '') {
         this.errorMessage = 'Please provide both a category name and a task description.';
         this.cdr.detectChanges(); // Force UI update
@@ -309,8 +305,8 @@ onFilterChange(): void {
       startTime: startDate.toISOString(), 
       endTime: endDate.toISOString(),
       isCompleted: false,                
-      subid: validSubid,  // 👈 Passing the verified relational ID
-      source: "Angular"   // No more smuggling!
+      subid: validSubid,
+      source: "Angular"
     };
 
     if (this.isEditing && this.selectedTask?.id) {
@@ -318,7 +314,7 @@ onFilterChange(): void {
       this.tasksApi.apiTasksIdPut(this.selectedTask.id, payload).subscribe({
         next: () => {
           this.closeModal();
-          this.loadSubjectsAndTasks(); // Reload everything to ensure sync
+          this.loadSubjectsAndTasks();
         },
         error: (err) => console.error('Failed to update task', err)
       });
@@ -326,7 +322,7 @@ onFilterChange(): void {
       this.tasksApi.apiTasksPost(payload).subscribe({
         next: () => {
           this.closeModal();
-          this.loadSubjectsAndTasks(); // Reload everything to ensure sync
+          this.loadSubjectsAndTasks();
         },
         error: (err) => console.error('Failed to save task', err)
       });
@@ -345,7 +341,6 @@ onFilterChange(): void {
     });
   }
 
-  // --- UTILITIES ---
   isDayExpanded(dayNumber: number | null): boolean { return this.expandedDay === dayNumber; }
   toggleMoreTasks(dayNumber: number | null): void { if (dayNumber !== null) this.expandedDay = this.expandedDay === dayNumber ? null : dayNumber; }
   getTasksForDay(dayNumber: number | null): CalendarTask[] {
@@ -355,7 +350,6 @@ onFilterChange(): void {
     task.day === dayNumber &&
     task.month === this.currentDate.getMonth() &&
     task.year === this.currentDate.getFullYear() &&
-    // 👈 The Filter: Only show if no filter is set OR if the IDs match
     (this.filterSubid === null || task.subid === this.filterSubid)
   );
 }

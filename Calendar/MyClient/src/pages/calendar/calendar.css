@@ -1,28 +1,25 @@
-/* Container & Layout */
+
 .calendar-page {
   display: flex;
   height: 100vh;
   background-color: #f8f9fa;
-  /* Light neutral background */
   font-family: 'Inter', sans-serif;
 }
 .task-box, .task-box *, .task-box *::before, .task-box *::after {
-    box-sizing: border-box; /* Includes padding in the width calculation */
+    box-sizing: border-box;
 }
-
-/* --- Modal Overlay --- */
 .task-modal {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.5); /* Dim background */
+    background: rgba(0, 0, 0, 0.5);
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 1000;
-    backdrop-filter: blur(2px); /* Modern blur effect */
+    backdrop-filter: blur(2px);
 }
 .error-message {
     color: #d32f2f;
@@ -42,7 +39,7 @@
     background: white;
     padding: 30px;
     border-radius: 12px;
-    width: 450px; /* Fixed width for consistency */
+    width: 450px;
     max-width: 90%;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
     display: flex;
@@ -55,13 +52,11 @@
     font-size: 1.5rem;
     color: #333;
 }
-
-/* --- Labels and Inputs --- */
 .task-box label {
     font-size: 0.85rem;
     font-weight: 600;
     color: #666;
-    margin-bottom: -10px; /* Pull label closer to input */
+    margin-bottom: -10px;
 }
 
 .task-box input[type="text"],
@@ -79,16 +74,13 @@
 }
 
 .task-box input:focus, .task-box select:focus, .task-box textarea:focus {
-    border-color: #673ab7; /* Matches your theme color */
+    border-color: #673ab7;
 }
 
 .task-box textarea {
     height: 80px;
     resize: none;
 }
-
-/* --- Inline Group (Times and Color) --- */
-/* We'll put times side-by-side to save vertical space */
 .time-group {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -109,8 +101,6 @@
     cursor: pointer;
     background: none;
 }
-
-/* --- Buttons --- */
 .task-buttons {
     display: flex;
     justify-content: flex-end;
@@ -140,15 +130,11 @@
     background-color: #ef4444;
     color: white;
 }
-
-/* --- Category Wrapper specifically --- */
 .category-wrapper {
     display: flex;
     flex-direction: column;
     gap: 8px;
 }
-
-/* Sidebar Styling */
 .sidebar {
   width: 280px;
   background-color: #ffffff;
@@ -160,7 +146,6 @@
 
 .sidebar h2 {
   color: #673ab7;
-  /* Deep Purple Primary */
   font-weight: 700;
   margin-bottom: 30px;
   padding-left: 10px;
@@ -203,8 +188,6 @@
   margin-top: 20px;
   text-transform: uppercase;
 }
-
-/* Main Calendar Area */
 .calendar-main {
   flex-grow: 1;
   padding: 40px;
@@ -232,8 +215,6 @@
   height: 40px;
   cursor: pointer;
 }
-
-/* Grid & Cells */
 .weekdays {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
@@ -290,8 +271,6 @@
   border-left: 4px solid;
   /* Bound to task.color */
 }
-
-/* Modals/Popups */
 .task-box {
   position: absolute;
   top: 10%;
@@ -340,41 +319,26 @@
   border-radius: 8px;
   cursor: pointer;
 }
-
-/* --- Add Task Button inside Calendar Cells --- */
 .add-task-btn {
-    /* 1. Strip away the ugly browser defaults */
     background: transparent;
     border: none;
     outline: none;
-
-    /* 2. Style the "+" sign */
-    color: #673ab7; /* Subtle gray when not hovered */
+    color: #673ab7;
     font-size: 1.2rem;
     font-weight: 500;
-    
-    /* 3. Make it a perfect circle */
     width: 26px;
     height: 26px;
     border-radius: 50%;
-    
-    /* 4. Center the "+" perfectly inside the circle */
     display: flex;
     justify-content: center;
     align-items: center;
     cursor: pointer;
-
-    /* 5. Snap it to the top right corner of the calendar cell */
     position: absolute;
     top: 8px;
     right: 8px;
-
-    /* Smooth transition for the hover effect */
     transition: all 0.2s ease;
 }
-
-/* 6. Make it pop with your theme colors when hovered */
 .add-task-btn:hover {
-    background-color: #f3e5f5; /* Soft purple background */
-    color: #673ab7; /* Your primary Deep Purple */
+    background-color: #f3e5f5; 
+    color: #673ab7;
 }

@@ -20,22 +20,17 @@ export class AuthComponent {
   errorMessage='';
 
  onAuth() {
-    // Clear any previous errors on a new attempt
     this.errorMessage = '';
-
     if (!this.email || !this.password) {
       this.errorMessage = "Please fill in both your email and password.";
       return; 
     }
-
     this.authService.login(this.email, this.password).subscribe({
       next: (response) => {
         this.router.navigate(['/calendar']); 
       },
       error: (err) => {
         console.error('Oops!', err);
-        
-        // Catch the 400 Bad Request or 401 Unauthorized from your C# API
         if (err.status === 400 || err.status === 401) {
             this.errorMessage = 'Login failed. Incorrect email or password.';
             this.cdr.detectChanges();
@@ -49,8 +44,4 @@ export class AuthComponent {
       }
     });
   }
-
-   
-  
-
 }

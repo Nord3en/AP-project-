@@ -16,15 +16,14 @@ export class ProfileComponent implements OnInit {
     private router = inject(Router);
     private cdr = inject(ChangeDetectorRef);
 
-    userName: string = ''; // Start empty
+    userName: string = '';
     userEmail: string = '';
     newPassword: string = '';
-    isLoading: boolean = true; // Helpful for UX
+    isLoading: boolean = true;
     errorMessage: string = '';
     successMessage: string = '';
 
     ngOnInit(): void {
-        // 1. Fetch the real data as soon as the component wakes up
         this.authService.getMe().subscribe({
             next: (user) => {
                 this.userName = user.name;
@@ -34,18 +33,14 @@ export class ProfileComponent implements OnInit {
             },
             error: (err) => {
                 console.error('Failed to load profile', err);
-                // If the session expired, kick them back to login
                 this.router.navigate(['/login']);
             }
         });
     }
 
    saveChanges(): void {
-        // Clear previous messages
         this.errorMessage = '';
         this.successMessage = '';
-
-        // Validation: Prevent saving if name or email is empty
         if (!this.userName.trim() || !this.userEmail.trim()) {
             this.errorMessage = 'Name and Email are required.';
             this.cdr.detectChanges();
@@ -63,8 +58,6 @@ export class ProfileComponent implements OnInit {
                 this.successMessage = 'Profile updated successfully!';
                 this.newPassword = ''; 
                 this.cdr.detectChanges();
-
-                // Optional UX polish: Hide the success message after 3 seconds
                 setTimeout(() => {
                     this.successMessage = '';
                     this.cdr.detectChanges();
@@ -72,8 +65,6 @@ export class ProfileComponent implements OnInit {
             },
             error: (err) => {
                 console.error('Update failed', err);
-                
-                // Parse the C# backend error payload like we did in auth
                 if (err.error && typeof err.error === 'string') {
                     this.errorMessage = err.error;
                 } else if (err.error && err.error.message) {

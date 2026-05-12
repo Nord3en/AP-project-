@@ -24,7 +24,7 @@
             }
 
             // GET: api/Tasks
-            [HttpGet]// GET: api/Tasks
+            [HttpGet]
             [Authorize]
             public async Task<ActionResult<IEnumerable<CalendarTask>>> GetTasks()
             {

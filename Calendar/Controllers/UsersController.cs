@@ -30,13 +30,10 @@ namespace Calendar.Controllers
 [Authorize]
 public async Task<ActionResult<object>> GetMe()
 {
-    // The Bouncer identifies who is calling based on the cookie
     var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
     var user = await _context.Users.FindAsync(userId);
 
     if (user == null) return NotFound();
-
-    // We only return what's necessary (don't send the password hash back!)
     return Ok(new { name = user.Name, email = user.Email });
 }
 
@@ -90,7 +87,7 @@ public class UpdateProfileRequest
 {
     public string Name { get; set; }
     public string Email { get; set; }
-    public string? Password { get; set; } // Optional password change
+    public string? Password { get; set; }
 }
 
 
@@ -196,17 +193,13 @@ public class UpdateProfileRequest
         {
             return _context.Users.Any(e => e.Uid == id);
         }
-
-        // --- NEW METHOD NOW INSIDE THE CLASS ---
         [HttpGet("auth-status")]
         [Authorize] 
         public IActionResult CheckAuthStatus()
         {
             return Ok(new { isAuthenticated = true });
         }
-    } // End of UsersController class
-
-    // --- REQUEST CLASSES NOW INSIDE THE NAMESPACE ---
+    } 
     public class RegisterRequest
     {
         public string Email { get; set; }
@@ -219,4 +212,4 @@ public class UpdateProfileRequest
         public string Email { get; set; }
         public string Passhash { get; set; }
     }
-} // End of Namespace
+}
