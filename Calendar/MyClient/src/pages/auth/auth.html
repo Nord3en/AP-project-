@@ -13,6 +13,9 @@
       <label class="label-box">Enter password</label>
       <input type="password" class="custom-input" [(ngModel)]="password" placeholder="••••••">
     </div>
+    <div *ngIf="errorMessage" class="error-message">
+      {{ errorMessage }}
+    </div>
 
     <button class="continue-btn" (click)="onAuth()">Continue</button>
 

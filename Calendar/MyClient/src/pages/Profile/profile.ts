@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core'; // 👈 Added OnInit
+import { Component, inject, OnInit,ChangeDetectorRef } from '@angular/core'; // 👈 Added OnInit
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -14,11 +14,14 @@ import { AuthService } from '../../app/services/auth.service';
 export class ProfileComponent implements OnInit {
     private authService = inject(AuthService);
     private router = inject(Router);
+    private cdr = inject(ChangeDetectorRef);
 
     userName: string = ''; // Start empty
     userEmail: string = '';
     newPassword: string = '';
     isLoading: boolean = true; // Helpful for UX
+    errorMessage: string = '';
+    successMessage: string = '';
 
     ngOnInit(): void {
         // 1. Fetch the real data as soon as the component wakes up
@@ -27,6 +30,7 @@ export class ProfileComponent implements OnInit {
                 this.userName = user.name;
                 this.userEmail = user.email;
                 this.isLoading = false;
+                this.cdr.detectChanges()
             },
             error: (err) => {
                 console.error('Failed to load profile', err);
@@ -36,22 +40,48 @@ export class ProfileComponent implements OnInit {
         });
     }
 
-    saveChanges(): void {
-        // 2. Prepare the payload to match your C# UpdateProfileRequest DTO
+   saveChanges(): void {
+        // Clear previous messages
+        this.errorMessage = '';
+        this.successMessage = '';
+
+        // Validation: Prevent saving if name or email is empty
+        if (!this.userName.trim() || !this.userEmail.trim()) {
+            this.errorMessage = 'Name and Email are required.';
+            this.cdr.detectChanges();
+            return;
+        }
+
         const updateData = {
             name: this.userName,
             email: this.userEmail,
-            password: this.newPassword || null // Send null if blank so backend ignores it
+            password: this.newPassword || null 
         };
 
         this.authService.updateMe(updateData).subscribe({
             next: () => {
-                alert('Profile updated successfully!');
-                this.newPassword = ''; // Clear the password field for security
+                this.successMessage = 'Profile updated successfully!';
+                this.newPassword = ''; 
+                this.cdr.detectChanges();
+
+                // Optional UX polish: Hide the success message after 3 seconds
+                setTimeout(() => {
+                    this.successMessage = '';
+                    this.cdr.detectChanges();
+                }, 3000);
             },
             error: (err) => {
                 console.error('Update failed', err);
-                alert('Could not update profile. ' + (err.error?.message || ''));
+                
+                // Parse the C# backend error payload like we did in auth
+                if (err.error && typeof err.error === 'string') {
+                    this.errorMessage = err.error;
+                } else if (err.error && err.error.message) {
+                    this.errorMessage = err.error.message;
+                } else {
+                    this.errorMessage = 'Could not update profile. Please try again.';
+                }
+                this.cdr.detectChanges();
             }
         });
     }
@@ -60,7 +90,8 @@ export class ProfileComponent implements OnInit {
         const confirmed = confirm("Are you sure? This will delete your account and all your calendar data permanently.");
         
         if (confirmed) {
-            // 3. Trigger the backend deletion
+            this.errorMessage = '';
+            
             this.authService.deleteMe().subscribe({
                 next: () => {
                     alert('Your account has been deleted.');
@@ -68,7 +99,8 @@ export class ProfileComponent implements OnInit {
                 },
                 error: (err) => {
                     console.error('Delete failed', err);
-                    alert('Failed to delete account. Please try again.');
+                    this.errorMessage = 'Failed to delete account. Please try again.';
+                    this.cdr.detectChanges();
                 }
             });
         }

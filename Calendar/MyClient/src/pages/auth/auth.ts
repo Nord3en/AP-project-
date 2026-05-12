@@ -18,29 +18,32 @@ export class AuthComponent {
   password = '';
   errorMessage='';
 
-  onAuth(){
-    console.error('inside onauth function');
-    if(!this.email || !this.password){
-      console.error('error');
-      this.errorMessage="All field are required"
-        alert('All field are required');
-      console.log("All field are required")
-      return;
+ onAuth() {
+    // Clear any previous errors on a new attempt
+    this.errorMessage = '';
+
+    if (!this.email || !this.password) {
+      this.errorMessage = "Please fill in both your email and password.";
+      return; 
     }
 
-
-    this.authService.login(this.email,this.password).subscribe({
-        next: (response) => {
-        console.log('successful login', response);
-        this.router.navigate(['/calendar']); // Take them to the login page
+    this.authService.login(this.email, this.password).subscribe({
+      next: (response) => {
+        this.router.navigate(['/calendar']); 
       },
       error: (err) => {
         console.error('Oops!', err);
         
-        this.errorMessage = 'Login failed. The email or the password is wrong';
+        // Catch the 400 Bad Request or 401 Unauthorized from your C# API
+        if (err.status === 400 || err.status === 401) {
+            this.errorMessage = 'Login failed. Incorrect email or password.';
+        } else if (err.status === 0) {
+            this.errorMessage = 'Cannot connect to the server.';
+        } else {
+            this.errorMessage = 'An unexpected error occurred. Please try again.';
+        }
       }
-    })
-
+    });
   }
 
    

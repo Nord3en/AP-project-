@@ -39,7 +39,6 @@ export class CalendarComponent implements OnInit {
   private tasksApi = inject(TasksService);
   private subjectsApi = inject(SubjectsService); // 👈 Injected!
   private cdr = inject(ChangeDetectorRef);
-  
   weekDays: string[] = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
   currentDate: Date = new Date();
@@ -63,6 +62,7 @@ export class CalendarComponent implements OnInit {
   newColor: string = '#673ab7';
   newStartTime: string = '09:00';
   newEndTime: string = '10:00';
+  errorMessage: string = ''; //
 
   ngOnInit(): void {
     this.buildCalendar();
@@ -134,7 +134,7 @@ export class CalendarComponent implements OnInit {
     this.newColor = '#673ab7';
     this.newStartTime = '09:00';
     this.newEndTime = '10:00';
-    
+    this.errorMessage = '';
     this.showTaskModal = true;
   }
 
@@ -148,7 +148,7 @@ export class CalendarComponent implements OnInit {
     this.newColor = task.color;
     this.newStartTime = task.startTime;
     this.newEndTime = task.endTime;
-
+    this.errorMessage = '';
     this.showTaskModal = true;
   }
 
@@ -176,6 +176,7 @@ isExistingCategory(): boolean {
     this.showTaskModal = false;
     this.selectedTask = null;
     this.isEditing = false;
+    this.cdr.detectChanges();
   }
 
   
@@ -232,9 +233,17 @@ isExistingCategory(): boolean {
 onFilterChange(): void {
   this.cdr.detectChanges(); // Force UI to refresh
 }
-  saveTask(): void {
+      saveTask(): void {
+    this.errorMessage = ''; // Clear previous errors
+
     const categoryName = this.isExistingCategory() ? this.selectedSubjectName : this.newCategory;
-    if (this.newTaskText.trim() === '' || categoryName.trim() === '') return;
+    
+    // 1. Check for empty fields and warn the user!
+    if (this.newTaskText.trim() === '' || categoryName.trim() === '') {
+        this.errorMessage = 'Please provide both a category name and a task description.';
+        this.cdr.detectChanges(); // Force UI update
+        return;
+    }
 
     const existingSubject = this.subjects.find(
       s => s.name.toLowerCase() === categoryName.trim().toLowerCase()
@@ -244,26 +253,25 @@ onFilterChange(): void {
       const subjectId = existingSubject.subid || existingSubject.id;
       const oldColor = existingSubject.colorCode || existingSubject.color_code;
 
-      // Check if the user changed the color of the existing category
       if (this.newColor !== oldColor) {
         const updatedSubject = { ...existingSubject, colorCode: this.newColor };
         
-        // 1. Update the Category color in the DB (PUT)
         this.subjectsApi.apiSubjectsIdPut(subjectId, updatedSubject).subscribe({
           next: () => {
-            // Update local array so the calendar colors change immediately
             existingSubject.colorCode = this.newColor;
             existingSubject.color_code = this.newColor;
             this.executeTaskSave(subjectId);
           },
-          error: (err) => console.error('Failed to update category color', err)
+          error: (err) => {
+              console.error('Failed to update category color', err);
+              this.errorMessage = 'Failed to update category color on the server.';
+              this.cdr.detectChanges();
+          }
         });
       } else {
-        // No color change, just save the task
         this.executeTaskSave(subjectId);
       }
     } else {
-      // 2. It's a brand new category (POST)
       const newSubjectPayload: any = {
         name: categoryName.trim(),
         colorCode: this.newColor
@@ -274,11 +282,14 @@ onFilterChange(): void {
           this.subjects.push(createdSubject);
           this.executeTaskSave(createdSubject.subid || createdSubject.id);
         },
-        error: (err) => console.error('Failed to create new category', err)
+        error: (err) => {
+            console.error('Failed to create new category', err);
+            this.errorMessage = 'Failed to create a new category on the server.';
+            this.cdr.detectChanges();
+        }
       });
     }
   }
-
   executeTaskSave(validSubid: number): void {
     const dayToSave = this.isEditing && this.selectedTask ? this.selectedTask.day : this.selectedDay;
     if (dayToSave === null) return;

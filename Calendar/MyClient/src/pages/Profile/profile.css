@@ -5,8 +5,11 @@
     align-items: center;
     min-height: 100vh;
     background-color: #f4f4f9;
-    /* Light grey background like login */
     font-family: 'Inter', sans-serif;
+    
+    /* Added padding for mobile screen edges */
+    padding: 20px;
+    box-sizing: border-box;
 }
 
 /* The White Card */
@@ -117,4 +120,31 @@ input {
     color: #6b46c1;
     text-decoration: none;
     font-size: 0.9rem;
+}
+
+
+.error-message {
+    color: #d32f2f;
+    background-color: #fdeaea;
+    border: 1px solid #f5c6c6;
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    text-align: left;
+}
+
+.success-message {
+    color: #2e7d32;
+    background-color: #edf7ed;
+    border: 1px solid #c8e6c9;
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    text-align: left;
+}
+
+.error-border {
+    border-color: #d32f2f !important;
 }

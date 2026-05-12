@@ -24,7 +24,19 @@
     z-index: 1000;
     backdrop-filter: blur(2px); /* Modern blur effect */
 }
+.error-message {
+    color: #d32f2f;
+    background-color: #fdeaea;
+    border: 1px solid #f5c6c6;
+    padding: 10px;
+    border-radius: 4px;
+    font-size: 14px;
+    text-align: left;
+}
 
+.error-border {
+    border-color: #d32f2f !important;
+}
 /* --- Modal Content Box --- */
 .task-box {
     background: white;
@@ -327,4 +339,42 @@
   padding: 8px 16px;
   border-radius: 8px;
   cursor: pointer;
+}
+
+/* --- Add Task Button inside Calendar Cells --- */
+.add-task-btn {
+    /* 1. Strip away the ugly browser defaults */
+    background: transparent;
+    border: none;
+    outline: none;
+
+    /* 2. Style the "+" sign */
+    color: #673ab7; /* Subtle gray when not hovered */
+    font-size: 1.2rem;
+    font-weight: 500;
+    
+    /* 3. Make it a perfect circle */
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    
+    /* 4. Center the "+" perfectly inside the circle */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+
+    /* 5. Snap it to the top right corner of the calendar cell */
+    position: absolute;
+    top: 8px;
+    right: 8px;
+
+    /* Smooth transition for the hover effect */
+    transition: all 0.2s ease;
+}
+
+/* 6. Make it pop with your theme colors when hovered */
+.add-task-btn:hover {
+    background-color: #f3e5f5; /* Soft purple background */
+    color: #673ab7; /* Your primary Deep Purple */
 }

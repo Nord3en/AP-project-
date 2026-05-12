@@ -137,7 +137,9 @@
       <label>Task Description</label>
       <textarea [(ngModel)]="newTaskText" placeholder="What needs to be done?" style="width: 100%; min-height: 80px;"></textarea>
     </div>
-
+    <div *ngIf="errorMessage" class="error-message" style="margin-top: 10px;">
+        {{ errorMessage }}
+    </div>
     <div class="task-buttons">
       <button class="save-btn" (click)="saveTask()">
         {{ isEditing ? 'Save Changes' : 'Add Task' }}

@@ -17,6 +17,13 @@
             <input type="password" [(ngModel)]="newPassword" name="newPassword" placeholder="Enter new password">
         </div>
 
+        <div *ngIf="errorMessage" class="error-message">
+            {{ errorMessage }}
+        </div>
+        <div *ngIf="successMessage" class="success-message">
+            {{ successMessage }}
+        </div>
+
         <button class="btn-save" (click)="saveChanges()">Update Settings</button>
 
         <button class="btn-delete" (click)="deleteProfile()">Delete My Account</button>

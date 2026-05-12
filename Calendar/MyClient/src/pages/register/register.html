@@ -16,7 +16,12 @@
             <div class="label-box">Password</div>
             <input type="password" class="custom-input" [(ngModel)]="password">
         </div>
-
+        <div *ngIf="errorMessage" class="error-message">
+            {{ errorMessage }}
+        </div>
+        <div *ngIf="successMessage" class="success-message">
+            {{ successMessage }}
+        </div>
         <button class="signup-btn" (click)="onRegister()">Sign up</button>
 
         <p class="footer-text">Already have an account?</p>
